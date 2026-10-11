@@ -10,12 +10,12 @@ from rclpy.signals import SignalHandlerOptions
 from std_msgs.msg import Float32MultiArray
 
 # ---- Calibration constants ----
-CMD_PER_MPS = 1.0    # TODO: calibrate on real robot: motor command per m/s (straight-run test)
-TRACK_WIDTH = 0.20   # TODO: calibrate on real robot: effective wheel spacing in m (spin test)
-LEFT_SCALE = 1.0     # TODO: calibrate on real robot: >1 boosts the left wheel if it curves right
-RIGHT_SCALE = 1.0    # TODO: calibrate on real robot: >1 boosts the right wheel if it curves left
-CRUISE_SPEED = 0.15  # m/s, kept low for first runs
-TURN_RATE = 1.0      # rad/s, kept low for first runs
+CMD_PER_MPS = 0.74  # TODO: calibrate on real robot: motor command per m/s (straight-run test)
+TRACK_WIDTH = 0.69  # TODO: calibrate on real robot: effective wheel spacing in m (spin test)
+LEFT_SCALE = 0.9975   # TODO: calibrate on real robot: >1 boosts the left wheel if it curves right
+RIGHT_SCALE = 1.0   # TODO: calibrate on real robot: >1 boosts the right wheel if it curves left
+CRUISE_SPEED = 0.55  # m/s, kept low for first runs
+TURN_RATE = 1.57    # rad/s, kept low for first runs
 TURN_SIGN = 1        # TODO: flip to -1 if positive omega (L-, R+) turns the robot right
 PAUSE = 0.3          # s of zeros between moves
 RATE = 20.0          # Hz; motor_control stops the wheels after 0.15 s without a message
