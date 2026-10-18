@@ -1,0 +1,5 @@
+# x, y, theta per line (m, m, rad), relative to the start pose (0, 0, 0 = where the robot is placed, facing +x)
+0, 0, 0
+1, 0, 0
+1, 2, 3.14159
+0, 0, 0
