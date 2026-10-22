@@ -2,18 +2,18 @@
 # All coordinates are in the WORLD frame: origin = where the robot starts, x = its initial facing, y = left.
 /**:
   ros__parameters:
-    # ---- tag map. Tags 4 and 5 are NOT in here yet: append their id, x, y, z, yaw to the END of each list below. ----
+    # ---- tag map. Tag 5 is NOT in here yet (tag 4 is): append its id, x, y, z, yaw to the END of each list below. ----
     # Measure each tag CENTER from the robot's start pose (center of the robot, between the wheels):
     # x = ahead along the starting direction, y = left (negative = right), z = height of the center, yaw = direction the
     # tag faces (pi = facing -x, 0 = facing +x, -1.5708 = facing -y, 1.5708 = facing +y). yaw is not used by the filter.
     # Every number in the x/y/z/yaw lists MUST have a decimal point (2.0, not 2): ROS rejects mixed int/float lists.
     # The 5 lists must all have the same length. Check each tag with tf2_echo: camera z = distance ahead of the camera.
     tags:
-      ids: [0, 1, 2, 3]
-      x: [2.0, 1.5, 0.5, 0.0]
-      y: [0.0, 3.0, 3.0, 2.0]
-      z: [0.12, 0.12, 0.12, 0.12]
-      yaw: [3.14159, 3.14159, -1.5708, -1.5708]
+      ids: [0, 1, 2, 3, 4]
+      x: [2.0, 1.5, 0.5, 0.0, -0.5]
+      y: [0.0, 3.0, 3.0, 2.0, -0.5]
+      z: [0.12, 0.12, 0.12, 0.12, 0.12]
+      yaw: [3.14159, 3.14159, -1.5708, -1.5708, 0.7854]
 
     # ---- camera mount in the vehicle frame (x forward, y left, z up, m); pitch down in degrees (0 = level) ----
     camera:
