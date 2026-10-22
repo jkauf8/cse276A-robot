@@ -1,17 +1,17 @@
-# TEST copy of localization.yaml (waypoints (0,0,0) -> (1,0,0) -> (1,2,pi), two-tag map). Parameters for localization_control (and fake_detections, which reads the same tag map and camera mount).
+# TEST copy of localization.yaml (waypoints (0,0,0) -> (1,0,0) -> (1,2,pi), four-tag map). Parameters for localization_control (and fake_detections, which reads the same tag map and camera mount).
 # All coordinates are in the WORLD frame: origin = where the robot starts, x = its initial facing, y = left.
 /**:
   ros__parameters:
-    # ---- tag map for the leg-1 test: the 2 tags behind (1, 0). ----
+    # ---- tag map for the test route: tags 0,1 behind (1, 0) (seen on leg 1); tags 2,3 at y = 3 (seen on leg 2). ----
     # Tag ids/x/y set from measurements; re-measure if the tags move. Measure each tag CENTER from the robot's
     # !!! start pose (center of the robot, between the wheels): x = ahead, y = left (negative = right). yaw = direction the
     # !!! tag faces (pi = facing back toward the robot). Check with tf2_echo: camera z should equal tag x - 0.085.
     tags:
-      ids: [0, 1]
-      x: [2, 2]
-      y: [0.5, -0.5]
-      z: [0.12, 0.12]
-      yaw: [3.14159, 3.14159]
+      ids: [0, 1, 2, 3]
+      x: [2, 2, 0.5, 1.5]
+      y: [0.5, -0.5, 3, 3]
+      z: [0.12, 0.12, 0.12, 0.12]
+      yaw: [3.14159, 3.14159, -1.5708, -1.5708]
 
     # ---- camera mount in the vehicle frame (x forward, y left, z up, m); pitch down in degrees (0 = level) ----
     camera:
@@ -24,7 +24,7 @@
 
     # ---- mission ----
     waypoints_file: '/home/ubuntu/ros2_ws/install/robot_control/share/robot_control/config/hw2_leg1_waypoints.txt'  # test route only: (0,0,0) -> (1,0,0) -> (1,2,pi)
-    max_blind_time: 20.0         # s without a usable tag detection before the robot stops (raised from 10: no tag is in view during leg 2 yet)
+    max_blind_time: 20.0         # s without a usable tag detection before the robot stops (raised from 10 while testing the new route; can go back to 10)
     start_delay: 1.0             # s of zero commands before moving
     rate: 20.0
 
