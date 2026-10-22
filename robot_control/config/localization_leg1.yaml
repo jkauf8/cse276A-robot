@@ -1,4 +1,4 @@
-# LEG-1 TEST copy of localization.yaml (waypoints (0,0,0) -> (1,0,0), two-tag map). Parameters for localization_control (and fake_detections, which reads the same tag map and camera mount).
+# TEST copy of localization.yaml (waypoints (0,0,0) -> (1,0,0) -> (1,2,pi), two-tag map). Parameters for localization_control (and fake_detections, which reads the same tag map and camera mount).
 # All coordinates are in the WORLD frame: origin = where the robot starts, x = its initial facing, y = left.
 /**:
   ros__parameters:
@@ -23,8 +23,8 @@
     tag_frame_prefix: tag_       # must match tag.frames in apriltag_hw2.yaml (tag_<id>)
 
     # ---- mission ----
-    waypoints_file: '/home/ubuntu/ros2_ws/install/robot_control/share/robot_control/config/hw2_leg1_waypoints.txt'  # leg-1 test only: (0,0,0) -> (1,0,0)
-    max_blind_time: 10.0         # s without a usable tag detection before the robot stops
+    waypoints_file: '/home/ubuntu/ros2_ws/install/robot_control/share/robot_control/config/hw2_leg1_waypoints.txt'  # test route only: (0,0,0) -> (1,0,0) -> (1,2,pi)
+    max_blind_time: 20.0         # s without a usable tag detection before the robot stops (raised from 10: no tag is in view during leg 2 yet)
     start_delay: 1.0             # s of zero commands before moving
     rate: 20.0
 
