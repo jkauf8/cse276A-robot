@@ -1,0 +1,37 @@
+# LEG-1 TEST copy of localization.yaml (waypoints (0,0,0) -> (1,0,0), two-tag map). Parameters for localization_control (and fake_detections, which reads the same tag map and camera mount).
+# All coordinates are in the WORLD frame: origin = where the robot starts, x = its initial facing, y = left.
+/**:
+  ros__parameters:
+    # ---- tag map for the leg-1 test: the 2 tags behind (1, 0). ----
+    # !!! PLACEHOLDER VALUES: replace ids/x/y with the real tags BEFORE running. Measure each tag CENTER from the robot's
+    # !!! start pose (center of the robot, between the wheels): x = ahead, y = left (negative = right). yaw = direction the
+    # !!! tag faces (pi = facing back toward the robot). Check with tf2_echo: camera z should equal tag x - 0.085.
+    tags:
+      ids: [0, 1]
+      x: [2.0, 2.0]
+      y: [0.3, -0.3]
+      z: [0.12, 0.12]
+      yaw: [3.14159, 3.14159]
+
+    # ---- camera mount in the vehicle frame (x forward, y left, z up, m); pitch down in degrees (0 = level) ----
+    camera:
+      x: 0.085
+      y: 0.0
+      z: 0.125
+      pitch_deg: 0.0
+    camera_frame: camera_frame   # frame_id robot_vision puts on its images; apriltag_node's TF parent
+    tag_frame_prefix: tag_       # must match tag.frames in apriltag_hw2.yaml (tag_<id>)
+
+    # ---- mission ----
+    waypoints_file: '/home/ubuntu/ros2_ws/install/robot_control/share/robot_control/config/hw2_leg1_waypoints.txt'  # leg-1 test only: (0,0,0) -> (1,0,0)
+    max_blind_time: 10.0         # s without a usable tag detection before the robot stops
+    start_delay: 1.0             # s of zero commands before moving
+    rate: 20.0
+
+    # ---- controller: TO MEASURE on the carpet ----
+    min_cmd: 0.12                # smallest wheel command used while moving
+    deadband: 0.10               # wheel commands below this do not move the wheel
+    turn_tol_deg: 2.0
+    reaim_tol_deg: 5.0
+    pos_tol: 0.03
+    # log_dir: /home/ubuntu/hw2_logs   # CSV log folder; default is ~/hw2_logs
