@@ -29,7 +29,7 @@
     rate: 20.0
 
     # ---- controller: TO MEASURE on the carpet ----
-    min_cmd: 0.20                # smallest wheel command used while moving (raised from 0.12: the robot stalled mid-turn at low commands)
+    min_cmd: 0.25                # smallest wheel command used while moving (raised 0.12 -> 0.20 -> 0.25: the robot stalled mid-turn at low commands)
     deadband: 0.10               # wheel commands below this do not move the wheel
     turn_tol_deg: 2.0
     reaim_tol_deg: 5.0
