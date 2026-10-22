@@ -52,7 +52,7 @@ print(f'RMS reprojection error: {rms:.3f} px (good is under ~0.5, acceptable und
 print('K =\n', K, '\nD =', D.ravel())
 for p, o, i, r, t in zip(used, obj, img, rvecs, tvecs):
     proj, _ = cv2.projectPoints(o, r, t, K, D)
-    e = cv2.norm(i, proj, cv2.NORM_L2) / np.sqrt(len(proj))
+    e = np.sqrt(np.mean(np.sum((i.reshape(-1, 2) - proj.reshape(-1, 2)) ** 2, axis=1)))
     if e > 1.5 * rms:
         print(f'  high error {e:.2f} px: {p} (consider deleting it)')
 
