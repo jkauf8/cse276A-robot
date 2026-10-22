@@ -8,8 +8,8 @@
     # !!! tag faces (pi = facing back toward the robot). Check with tf2_echo: camera z should equal tag x - 0.085.
     tags:
       ids: [0, 1, 2, 3]
-      x: [2.0, 2.0, 0.5, 1.5]
-      y: [0.5, -0.5, 3.0, 3.0]
+      x: [2.0, 1.5, 0.5, 0.0]
+      y: [0.0, 3.0, 3.0, 2.0]
       z: [0.12, 0.12, 0.12, 0.12]
       yaw: [3.14159, 3.14159, -1.5708, -1.5708]
 
@@ -29,7 +29,7 @@
     rate: 20.0
 
     # ---- controller: TO MEASURE on the carpet ----
-    min_cmd: 0.25                # smallest wheel command used while moving (raised 0.12 -> 0.20 -> 0.25: the robot stalled mid-turn at low commands)
+    min_cmd: 0.30                # smallest wheel command used while moving (raised 0.12 -> 0.20 -> 0.25: the robot stalled mid-turn at low commands)
     deadband: 0.10               # wheel commands below this do not move the wheel
     turn_tol_deg: 2.0
     reaim_tol_deg: 5.0
