@@ -36,10 +36,5 @@
     turn_tol_deg: 2.0
     reaim_tol_deg: 5.0
     pos_tol: 0.03
-    turn_gain: 0.87              # measured from the logs: the robot turns about 87% of what is commanded (7 big turns, 0.80-0.93)
     final_checks: 2              # after the last turn: pause 1 s for a tag fix, then re-turn if the heading is off (0 = old behaviour)
     # log_dir: /home/ubuntu/hw2_logs   # CSV log folder; default is ~/hw2_logs
-
-    # ---- filter ----
-    ekf:
-      gate: 40.0                 # reject a tag reading if it disagrees with the estimate by more than this (was 20); lets a 20 degree heading error at the end through
