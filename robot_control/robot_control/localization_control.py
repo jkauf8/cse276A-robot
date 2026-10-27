@@ -45,6 +45,7 @@ class LocalizationNode(Node):
         self.declare_parameter('turn_tol_deg', 2.0)
         self.declare_parameter('reaim_tol_deg', 5.0)
         self.declare_parameter('pos_tol', 0.03)
+        self.declare_parameter('turn_gain', 1.0)  # real turn / commanded turn: the filter scales the commanded yaw rate by this (carpet under-turns)
         self.declare_parameter('final_checks', 2)  # after the last turn: pause for a tag fix, re-check the heading this many times
         self.declare_parameter('log_dir', os.path.expanduser('~/hw2_logs'))
         for key, val in E.NOISE.items():
@@ -53,6 +54,7 @@ class LocalizationNode(Node):
         P = lambda name: self.get_parameter(name).value
         E.check_constants(vc)
         self.rate = P('rate')
+        self.turn_gain = P('turn_gain')
         self.camera_frame, self.prefix = P('camera_frame'), P('tag_frame_prefix')
         self.max_blind, self.start_delay, self.tf_max_age = P('max_blind_time'), P('start_delay'), P('tf_max_age')
         tag_map = read_tag_map(self)
@@ -146,7 +148,8 @@ class LocalizationNode(Node):
             return
         now = time.monotonic()
         dt, self.t_prev = min(now - self.t_prev, 0.2), now
-        self.ekf.predict(*E.cmds_to_vw(*self.cmd), dt)  # the command sent last tick acted during dt
+        v, w = E.cmds_to_vw(*self.cmd)
+        self.ekf.predict(v, w * self.turn_gain, dt)  # the command sent last tick acted during dt
         ros_s = self.get_clock().now().nanoseconds * 1e-9
         self.history.append((ros_s, *self.ekf.x))
         while self.history and ros_s - self.history[0][0] > HISTORY:
