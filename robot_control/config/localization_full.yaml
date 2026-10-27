@@ -10,7 +10,7 @@
     # The 5 lists must all have the same length. Check each tag with tf2_echo: camera z = distance ahead of the camera.
     tags:
       ids: [0, 1, 2, 3, 4]
-      x: [2.0, 1.5, 0.5, 0.0, -0.5]
+      x: [1.5, 1.5, 0.5, 0.0, -0.5]
       y: [0.0, 3.0, 3.0, 2.0, -0.5]
       z: [0.12, 0.12, 0.12, 0.12, 0.12]
       yaw: [3.14159, -2.0344, -1.1071, 0.0, 0.7854]
@@ -36,4 +36,5 @@
     turn_tol_deg: 2.0
     reaim_tol_deg: 5.0
     pos_tol: 0.03
+    final_checks: 2              # after the last turn: pause 1 s for a tag fix, then re-turn if the heading is off (0 = old behaviour)
     # log_dir: /home/ubuntu/hw2_logs   # CSV log folder; default is ~/hw2_logs

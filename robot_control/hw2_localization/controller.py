@@ -17,14 +17,17 @@ KP_DRIVE = 2.0  # forward speed (m/s) per m of distance left
 KP_HEADING = 1.5  # steering (rad/s) per rad of heading error while driving
 MAX_STEER = 1.0  # rad/s
 WP_TIMEOUT = 60.0  # give up on a waypoint after this long (s)
+FINAL_CHECKS = 2  # after the last waypoint's final turn: pause, then re-check the heading up to this many times
 
 
 class Controller:
     def __init__(self, waypoints, wheel_cmds, cruise_speed, turn_rate, pause, turn_sign=1,
-                 min_cmd=MIN_CMD, deadband=0.0, turn_tol=TURN_TOL, reaim_tol=REAIM_TOL, pos_tol=POS_TOL):
+                 min_cmd=MIN_CMD, deadband=0.0, turn_tol=TURN_TOL, reaim_tol=REAIM_TOL, pos_tol=POS_TOL,
+                 final_checks=FINAL_CHECKS):
         self.wps, self.wheel_cmds = waypoints, wheel_cmds
         self.cruise, self.turn_rate, self.pause, self.turn_sign = cruise_speed, turn_rate, pause, turn_sign
         self.turn_tol, self.reaim_tol, self.pos_tol = turn_tol, reaim_tol, pos_tol
+        self.final_checks, self.checks = final_checks, 0  # heading re-checks left to do / done at the end of the route
         floor = max(min_cmd, deadband)  # a wheel command below the deadband does nothing, so never ask for one
         # slowest body speeds that still give a wheel command of `floor`
         self.v_min = floor / (wheel_cmds(0.1, 0.0)[0] / 0.1)
@@ -110,8 +113,18 @@ class Controller:
             steer = 0.0 if dist < NEAR else max(-MAX_STEER, min(MAX_STEER, KP_HEADING * herr))
             return self._cmd(v, steer)
 
-        # phase == 'final'
         err = wrap(gth - pose[2])
+        if self.phase == 'verify':  # the pause after the last turn gave tags time to correct the estimate
+            if abs(err) < self.turn_tol:
+                return self._finish_waypoint(t)
+            self.phase, self.t0 = 'final', t
+            self._begin('final', t, pose)
+            return self._turn(err)
+
+        # phase == 'final'
         if abs(err) < self.turn_tol or timed_out:
+            if self.i == len(self.wps) - 1 and self.checks < self.final_checks:
+                self.checks += 1
+                return self._stop_then('verify', t)
             return self._finish_waypoint(t)
         return self._turn(err)

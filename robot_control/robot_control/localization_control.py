@@ -45,6 +45,7 @@ class LocalizationNode(Node):
         self.declare_parameter('turn_tol_deg', 2.0)
         self.declare_parameter('reaim_tol_deg', 5.0)
         self.declare_parameter('pos_tol', 0.03)
+        self.declare_parameter('final_checks', 2)  # after the last turn: pause for a tag fix, re-check the heading this many times
         self.declare_parameter('log_dir', os.path.expanduser('~/hw2_logs'))
         for key, val in E.NOISE.items():
             self.declare_parameter(f'ekf.{key}', float(val))
@@ -60,7 +61,7 @@ class LocalizationNode(Node):
         self.ctrl = Controller(waypoints, vc.wheel_cmds, vc.CRUISE_SPEED, vc.TURN_RATE, vc.PAUSE, vc.TURN_SIGN,
                                min_cmd=P('min_cmd'), deadband=P('deadband'),
                                turn_tol=math.radians(P('turn_tol_deg')), reaim_tol=math.radians(P('reaim_tol_deg')),
-                               pos_tol=P('pos_tol'))
+                               pos_tol=P('pos_tol'), final_checks=P('final_checks'))
 
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
