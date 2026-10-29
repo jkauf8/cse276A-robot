@@ -1,13 +1,14 @@
-# FULL-RUN copy of localization.yaml: waypoints (0,0,0) -> (1,0,0) -> (1,2,pi) -> (0,0,0) (installed hw2_waypoints.txt). Parameters for localization_control (and fake_detections, which reads the same tag map and camera mount).
+# Parameters for localization_control (and fake_detections, which reads the same tag map and camera mount).
+# Route: (0,0,0) -> (1,0,0) -> (1,2,pi) -> (0,0,0), from the installed hw2_waypoints.txt.
 # All coordinates are in the WORLD frame: origin = where the robot starts, x = its initial facing, y = left.
 /**:
   ros__parameters:
-    # ---- tag map. Tag 5 is NOT in here yet (tag 4 is): append its id, x, y, z, yaw to the END of each list below. ----
+    # ---- tag map. Tag 5 is detected (apriltag_hw2.yaml) but ignored until it is added to the END of each list below. ----
     # Measure each tag CENTER from the robot's start pose (center of the robot, between the wheels):
     # x = ahead along the starting direction, y = left (negative = right), z = height of the center, yaw = direction the
     # tag faces (pi = facing -x, 0 = facing +x, -1.5708 = facing -y, 1.5708 = facing +y). yaw is not used by the filter.
     # Every number in the x/y/z/yaw lists MUST have a decimal point (2.0, not 2): ROS rejects mixed int/float lists.
-    # The 5 lists must all have the same length. Check each tag with tf2_echo: camera z = distance ahead of the camera.
+    # The 5 lists must all have the same length. Check a tag with tf2_echo: camera z = distance ahead of the camera.
     tags:
       ids: [0, 1, 2, 3, 4]
       x: [2.0, 1.5, 0.5, 0.0, -0.5]
@@ -25,16 +26,16 @@
     tag_frame_prefix: tag_       # must match tag.frames in apriltag_hw2.yaml (tag_<id>)
 
     # ---- mission ----
-    waypoints_file: ''           # '' = installed config/hw2_waypoints.txt, the full route
-    max_blind_time: 20.0         # s without a usable tag detection before the robot stops (raised from 10 while testing the new route; can go back to 10)
+    waypoints_file: ''           # '' = installed config/hw2_waypoints.txt
+    max_blind_time: 20.0         # s without a usable tag detection before the robot stops
     start_delay: 1.0             # s of zero commands before moving
     rate: 20.0
 
-    # ---- controller: TO MEASURE on the carpet ----
-    min_cmd: 0.30                # smallest wheel command used while moving (raised 0.12 -> 0.20 -> 0.25: the robot stalled mid-turn at low commands)
+    # ---- controller ----
+    min_cmd: 0.30                # smallest wheel command used while moving (lower values stalled mid-turn)
     deadband: 0.10               # wheel commands below this do not move the wheel
     turn_tol_deg: 2.0
     reaim_tol_deg: 5.0
     pos_tol: 0.03
-    final_checks: 2              # after the last turn: pause 1 s for a tag fix, then re-turn if the heading is off (0 = old behaviour)
+    final_checks: 2              # after the last turn: pause for a tag fix, then re-turn if the heading is still off (0 = off)
     # log_dir: /home/ubuntu/hw2_logs   # CSV log folder; default is ~/hw2_logs

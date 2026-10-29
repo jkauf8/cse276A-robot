@@ -23,7 +23,8 @@ R_VC_LEVEL = ((0.0, 0.0, 1.0),
               (-1.0, 0.0, 0.0),
               (0.0, -1.0, 0.0))
 
-# ---- Default tag map: id -> (x, y, z, facing yaw of the tag's normal), meters / radians. First pass, re-measure. ----
+# ---- Default tag map for the simulator: id -> (x, y, z, facing yaw of the tag's normal), meters / radians. ----
+# (the robot reads its real map from the params file)
 TAG_MAP = {
     0: (2.5, 0.0, 0.12, math.pi),
     1: (1.0, 3.0, 0.12, -math.pi / 2),

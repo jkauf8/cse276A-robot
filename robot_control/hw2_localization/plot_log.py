@@ -2,7 +2,7 @@
 
     python3 -m hw2_localization.plot_log ~/hw2_logs/localization_XXXX.csv --waypoints config/hw2_waypoints.txt
     ... --truth ~/hw2_logs/fake_truth.csv     # only exists for the fake-detection test (true pose of the fake robot)
-    ... --params config/localization.yaml     # draw the tag map from the config (needs PyYAML), else the defaults
+    ... --params config/localization_full.yaml     # draw the tag map from the config (needs PyYAML), else the defaults
 
 On the real robot there is no ground truth: the table shows the ESTIMATED pose vs each goal. Measure the real
 final position with a tape for the report. matplotlib is only needed for the plot.
@@ -109,7 +109,7 @@ def main():
     ap.add_argument('log', help='localization_*.csv from localization_control')
     ap.add_argument('--waypoints', required=True, help='the waypoint file the run used')
     ap.add_argument('--truth', help='fake_truth.csv (fake-detection test only)')
-    ap.add_argument('--params', help='localization.yaml, to draw the tag map (needs PyYAML)')
+    ap.add_argument('--params', help='params yaml (localization_full.yaml), to draw the tag map (needs PyYAML)')
     ap.add_argument('--out', default=None, help='PNG path (default: next to the log)')
     args = ap.parse_args()
 

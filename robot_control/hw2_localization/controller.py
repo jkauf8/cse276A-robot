@@ -7,7 +7,7 @@ import math
 
 from .ekf import wrap
 
-MIN_CMD = 0.12  # smallest wheel command used while moving (ASSUMED above the motors' deadband; measure on the robot)
+MIN_CMD = 0.12  # default smallest wheel command used while moving (localization_control sets it from min_cmd)
 TURN_TOL = math.radians(2)  # a turn is done when the heading error is below this
 REAIM_TOL = math.radians(5)  # while driving, stop and re-aim if the heading error grows past this
 POS_TOL = 0.03  # a drive is done when the distance to the waypoint is below this (m)
@@ -117,7 +117,6 @@ class Controller:
         if self.phase == 'verify':  # the pause after the last turn gave tags time to correct the estimate
             if abs(err) < self.turn_tol:
                 return self._finish_waypoint(t)
-            self.phase, self.t0 = 'final', t
             self._begin('final', t, pose)
             return self._turn(err)
 

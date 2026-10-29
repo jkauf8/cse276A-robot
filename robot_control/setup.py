@@ -12,9 +12,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/robot_teleop_launch.py']),
         ('share/' + package_name + '/config', ['config/waypoints.txt', 'config/hw2_waypoints.txt',
-                                               'config/localization.yaml', 'config/apriltag_hw2.yaml',
-                                               'config/hw2_leg1_waypoints.txt', 'config/localization_leg1.yaml',
-                                               'config/localization_full.yaml']),
+                                               'config/localization_full.yaml', 'config/apriltag_hw2.yaml']),
         ('share/' + package_name + '/launch', ['launch/tag_detection_launch.py', 'launch/localization_launch.py']),
     ],
     install_requires=[

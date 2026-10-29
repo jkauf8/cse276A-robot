@@ -40,12 +40,12 @@ class LocalizationNode(Node):
         self.declare_parameter('detections_topic', 'detections')
         self.declare_parameter('commands_topic', 'motor_commands')
         self.declare_parameter('tf_max_age', 0.3)  # s; newest-TF fallback is rejected if older than this
-        self.declare_parameter('min_cmd', 0.12)  # TO MEASURE on carpet: smallest wheel command used while moving
-        self.declare_parameter('deadband', 0.10)  # TO MEASURE on carpet: wheel commands below this do nothing
+        self.declare_parameter('min_cmd', 0.12)  # smallest wheel command used while moving
+        self.declare_parameter('deadband', 0.10)  # wheel commands below this do nothing
         self.declare_parameter('turn_tol_deg', 2.0)
         self.declare_parameter('reaim_tol_deg', 5.0)
         self.declare_parameter('pos_tol', 0.03)
-        self.declare_parameter('final_checks', 2)  # after the last turn: pause for a tag fix, re-check the heading this many times
+        self.declare_parameter('final_checks', 2)  # heading re-checks after the last turn (0 = none)
         self.declare_parameter('log_dir', os.path.expanduser('~/hw2_logs'))
         for key, val in E.NOISE.items():
             self.declare_parameter(f'ekf.{key}', float(val))

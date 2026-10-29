@@ -1,5 +1,5 @@
 """Parameter helpers shared by localization_control and fake_detections: the tag map and camera mount
-come from ROS parameters (config/localization.yaml), nothing is hard-coded in the nodes."""
+come from ROS parameters (config/localization_full.yaml), nothing is hard-coded in the nodes."""
 import math
 import os
 
@@ -9,7 +9,7 @@ from hw2_localization import ekf as E
 
 
 def declare_map_params(node):
-    """Declare the tag map and camera mount parameters (defaults = the first-pass layout in ekf.py)."""
+    """Declare the tag map and camera mount parameters (defaults = TAG_MAP and CAMERA in ekf.py)."""
     ids = sorted(E.TAG_MAP)
     node.declare_parameter('tags.ids', ids)
     for i, key in enumerate(('x', 'y', 'z', 'yaw')):

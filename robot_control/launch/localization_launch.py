@@ -1,4 +1,4 @@
-"""Start localization_control with config/localization.yaml (or your own copy via params_file:=...).
+"""Start localization_control with config/localization_full.yaml (or your own copy via params_file:=...).
 
     ros2 launch robot_control localization_launch.py
 """
@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    default = os.path.join(get_package_share_directory('robot_control'), 'config', 'localization.yaml')
+    default = os.path.join(get_package_share_directory('robot_control'), 'config', 'localization_full.yaml')
     return LaunchDescription([
         DeclareLaunchArgument('params_file', default_value=default),
         Node(package='robot_control', executable='localization_control', name='localization_control',

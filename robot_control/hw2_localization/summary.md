@@ -1,4 +1,4 @@
-# hw2_localization: what we've built so far
+# hw2_localization
 
 AprilTag-based localization (EKF) and a closed-loop waypoint controller for HW2, plus a simulator and a ROS 2 wrapper.
 The code in this folder is **stdlib-only and ROS-free**, so the simulator and the ROS node share it.
@@ -15,9 +15,9 @@ The code in this folder is **stdlib-only and ROS-free**, so the simulator and th
 | `plot_log.py` | Turns a `localization_control` CSV log into the trajectory plot and the waypoint error table |
 | `out/sim.png` | Closed-loop simulation plot |
 
-ROS side (in `robot_control/`): `localization_control.py` (the node), `fake_detections.py` (test stand-in for the camera),
-`localization_params.py`, `config/localization.yaml`, `config/apriltag_hw2.yaml`, `config/hw2_waypoints.txt`,
-`launch/tag_detection_launch.py`, `launch/localization_launch.py`.
+ROS side (in `robot_control/`): `robot_control/localization_control.py` (the node), `robot_control/fake_detections.py` (test stand-in for the camera),
+`robot_control/localization_params.py`, `config/localization_full.yaml`, `config/apriltag_hw2.yaml`, `config/hw2_waypoints.txt`,
+`launch/tag_detection_launch.py`, `launch/localization_launch.py`. The repo-root `run_hw2.sh` starts everything on the robot.
 
 ## EKF (`ekf.py`)
 - **Predict:** the same differential-drive model as `velocity_control.py`. `cmds_to_vw` inverts `wheel_cmds` to get `(v, w)` from the
@@ -35,6 +35,8 @@ Same structure as `velocity_control.py` (face the waypoint, drive, turn to the f
 - drive until the distance is under 3 cm, with proportional speed and steering. Stop and re-aim if the heading error exceeds 5 deg
   (not within 0.15 m of the goal, where the bearing is too noisy)
 - proportional control clipped to `CRUISE_SPEED` / `TURN_RATE`, never below `max(min_cmd, deadband)`
+- after the last waypoint's final turn: pause, re-check the heading against the (now tag-corrected) estimate, and turn again if it is
+  still off, up to `final_checks` times (default 2, `0` = off)
 - timeout on every move and 60 s per waypoint, so it cannot loop forever
 - zero command at the end of every move, then the 1 s pause from `velocity_control.PAUSE`
 
@@ -44,8 +46,9 @@ Same structure as `velocity_control.py` (face the waypoint, drive, turn to the f
 - Fake detections at 10 Hz: 60 deg horizontal field of view, 3.5 m max range, tags seen more than 70 deg edge-on are dropped, 5% random dropout,
   noise on range and bearing.
 - Default route `(0,0,0) -> (1,0,0) -> (1,2,pi) -> (0,0,0)`, tag map ID0 (2.5, 0) facing -x, ID1 (1, 3) facing -y, ID2 (-1.5, 2) facing +x, ID3 (-0.5, -1.5) facing 63 deg.
+  (This is the simulator's own layout, not the course layout in `config/localization_full.yaml`.)
 
-Run (from `robot_control/`): `python3 -m hw2_localization.run_sim` (the plot needs matplotlib; `--runs N` sets the Monte Carlo size).
+Run: `python3 -m hw2_localization.run_sim` (the plot needs matplotlib; `--runs N` sets the Monte Carlo size).
 
 ### Simulation results (seed 1, 3% wheel mismatch, 3% track error)
 True error, robot vs goal (cm / deg):
@@ -56,35 +59,42 @@ True error, robot vs goal (cm / deg):
 | 2 (1,2,180) | 43.5 / 14.0 | 2.9 / 0.3 |
 | 3 (0,0,0) | 47.6 / 24.3 | 1.7 / 0.3 |
 
-Run time to the last waypoint: 19.3 s open-loop, 31.1 s closed-loop.
+Run time to the last waypoint: 19.3 s open-loop, 32.1 s closed-loop.
 
-30 runs with random 1-5% errors: open-loop mean 33.6 cm / 17.8 deg (worst 164.7 cm), closed-loop mean 2.7 cm / 0.9 deg (worst 5.1 cm).
+30 runs with random 1-5% errors: open-loop mean 33.6 cm / 17.8 deg (worst 164.7 cm), closed-loop mean 2.7 cm / 0.9 deg (worst 5.1 cm, 3.3 deg).
 
 ## ROS 2 node (`robot_control/localization_control.py`)
 - 20 Hz tick: EKF predict from the last command, fuse pending detections, run the controller, publish `[L, R]` on `motor_commands`.
 - Detections: subscribes to `detections`, then reads the tag pose from TF (`camera_frame -> tag_<id>`) at the detection's header stamp.
   If that TF is missing it falls back to the newest TF, but only if it is under 0.3 s old.
-- Failsafe: no usable tag for `max_blind_time` (10 s) means stop and log a warning. Otherwise it runs predict-only.
+- Failsafe: no usable tag for `max_blind_time` means stop and log a warning. Otherwise it runs predict-only.
 - Always sends a final `[0, 0]` on finish or Ctrl-C (same pattern as `velocity_control.py`).
 - Writes a CSV log to `~/hw2_logs/` (time, pose, wheels, tags in view and their IDs, waypoint index, phase, uncertainty).
-- Everything is a parameter (`config/localization.yaml`): tag map, camera mount, waypoints, `min_cmd`, `deadband`, noise.
+- Everything is a parameter (`config/localization_full.yaml`): tag map, camera mount, waypoints, `min_cmd`, `deadband`, tolerances, noise.
 
-### What the camera/AprilTag code provides (checked in the source)
+### What the camera/AprilTag code provides
 - `apriltag_node` publishes **poses only as TF** (header = image header, child = `tag_<id>`). `/detections` has id, corners, centre and homography, no pose.
   It publishes `/detections` first and TF second.
 - Images and `camera_info` use frame `camera_frame`, which uses the OpenCV axes (x right, y down, z forward).
 - `image_proc` rectify: `/camera/image_raw` + `camera_info` -> `/camera/image_rect`, which apriltag reads.
 - The camera node's own `image_rectify` option publishes a mismatched `camera_info`, so keep it off.
-- The intrinsics in `robot_vision/config/camera_parameter.yaml` are untuned and look implausible. Recalibrate before trusting real poses.
+- The intrinsics in `robot_vision/config/camera_parameter.yaml` come from `robot_vision/calibration/` (`capture_frames.py` on the robot, `calibrate.py` on a laptop).
 
-### Launch files
+## Running it
+On the robot, `./run_hw2.sh` (from the repo root) starts the camera, tag detection, motor control and the run, each in a tmux window; the run waits for Enter.
+Without the script:
 ```
-ros2 launch robot_control tag_detection_launch.py tag_size:=0.150   # rectify + apriltag_node (family 36h11, ids 0-5)
-ros2 launch robot_control localization_launch.py                    # localization_control with config/localization.yaml
+ros2 launch robot_vision_camera robot_vision_camera.launch.py
+ros2 launch robot_control tag_detection_launch.py tag_size:=0.16   # rectify + apriltag_node (family 36h11, ids 0-5)
+ros2 run robot_control motor_control
+ros2 launch robot_control localization_launch.py                    # localization_control with config/localization_full.yaml
 ```
-The camera (`robot_vision`) and `motor_control` are started separately.
 
-## Tests done (all in the `ros_dev` container, no camera)
+After a run, plot a log with
+`python3 -m hw2_localization.plot_log LOG.csv --waypoints config/hw2_waypoints.txt [--truth fake_truth.csv]`.
+On the real robot there is no ground truth, so the table compares the estimated pose with each goal; measure the real final position with a tape.
+
+## Fake-detection tests (no camera)
 `fake_detections` simulates the robot and publishes the same TF and detection messages. It runs against `motor_control` with the fake serial module.
 
 | Test | Result |
@@ -94,15 +104,3 @@ The camera (`robot_vision`) and `motor_control` are started separately.
 | Ctrl-C mid-turn | Final zero command reached the serial output 52 ms after the last turn command. |
 | Newest-TF fallback (TF stamp offset 20 ms) | Route finished, 3 fallbacks used. |
 | Real `apriltag_node` on a synthetic tag image | A tag placed at (0, 0.005, 2.415) m was reported at (0.003, 0.009, 2.398) m. Our node used 59 detections. |
-
-Test scripts and logs: `~/ros2_ws/runs/hw2/`. Plot a log with
-`python3 -m hw2_localization.plot_log LOG.csv --waypoints config/hw2_waypoints.txt [--truth fake_truth.csv]`.
-
-## Still to do / unknown
-- **Real robot and camera:** nothing here has run on hardware. The camera is currently broken.
-- **To measure on the carpet:** `min_cmd` and `deadband` (placeholders 0.12 and 0.10), and the real wheel/track errors.
-- **To measure for the tags:** the printed tag size (`tag_size`) and the real tag positions and facing angles (the map is a first pass). Tags 4 and 5 are detected but have no map entry yet.
-- **Camera:** recalibrate intrinsics; confirm the 0.085 / 0 / 0.125 m mount and that it is level.
-- **HW2 handout:** not seen. `config/hw2_waypoints.txt` holds the assumed route used in the simulator, so replace it with the real waypoints.
-- **Noise and gate values:** the filter and simulator noise are my guesses, so retune on real detections. The simulator numbers are optimistic.
-- **Not committed:** all of this is untracked or modified in the working tree.

@@ -1,4 +1,4 @@
-"""TEST ONLY: stands in for the broken camera + apriltag_node. Simulates the robot (open-loop calibration error
+"""TEST ONLY: stands in for the camera + apriltag_node. Simulates the robot (open-loop calibration error
 from the simulator) driven by the commands on motor_commands, and publishes what apriltag_node would:
   - /tf   camera_frame -> tag_<id> (tag position in the camera frame; rotation is identity, NOT meaningful)
   - detections (AprilTagDetectionArray with id/family/centre; homography and corners are left zero)
@@ -22,7 +22,7 @@ from tf2_ros import TransformBroadcaster
 from hw2_localization import sim
 from robot_control.localization_params import declare_map_params, read_camera, read_tag_map
 
-FX, FY, CX, CY = 491.0, 492.0, 639.0, 357.0  # intrinsics from robot_vision/config/camera_parameter.yaml
+FX, FY, CX, CY = 491.0, 492.0, 639.0, 357.0  # approximate intrinsics, only used for the fake detection's pixel centre
 
 
 class FakeDetections(Node):
