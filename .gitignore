@@ -1,2 +1,17 @@
 __pycache__/
 robot_control/test/test_kinematics_controller.py
+# simulator and test-only tools (kept locally, not tracked)
+robot_control/hw2_localization/sim.py
+robot_control/hw2_localization/run_sim.py
+robot_control/hw2_localization/summary.md
+robot_control/hw2_localization/out/
+robot_control/robot_control/fake_detections.py
+
+# LaTeX build files and macOS junk
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+.DS_Store

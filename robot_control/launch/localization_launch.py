@@ -1,7 +1,4 @@
-"""Start localization_control with config/localization_full.yaml (or your own copy via params_file:=...).
-
-    ros2 launch robot_control localization_launch.py
-"""
+"""Launch localization_control with localization_full.yaml (override with params_file:=...)."""
 import os
 
 from ament_index_python.packages import get_package_share_directory

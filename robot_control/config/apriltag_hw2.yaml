@@ -1,10 +1,9 @@
-# Parameters for apriltag_node in HW2 (tag_detection_launch.py). apriltag_ros/cfg is left untouched.
-# `size` here is only a default: the launch argument tag_size overrides it.
+# Settings for apriltag_node (used by tag_detection_launch.py). The launch argument tag_size overrides size.
 /**:
   ros__parameters:
     image_transport: raw
     family: 36h11
-    size: 0.15                  # tag edge (outer black square) in meters; set with tag_size:=... at launch
+    size: 0.15                  # tag edge (black square) in meters
     max_hamming: 1
     pose_estimation_method: "pnp"
     detector:
@@ -14,6 +13,6 @@
       refine: True
       sharpening: 0.4
       debug: False
-    tag:                        # apriltag_node only publishes tags listed in `frames`
+    tag:                        # only tags listed in frames are published
       ids: [0, 1, 2, 3, 4, 5]
       frames: [tag_0, tag_1, tag_2, tag_3, tag_4, tag_5]

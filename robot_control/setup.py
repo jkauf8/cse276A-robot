@@ -33,7 +33,6 @@ setup(
             'keyboard_control = robot_control.keyboard_control:main',
             'velocity_control = robot_control.velocity_control:main',
             'localization_control = robot_control.localization_control:main',
-            'fake_detections = robot_control.fake_detections:main',
         ],
     },
 )

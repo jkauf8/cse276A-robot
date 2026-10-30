@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Run on the robot while the camera node is running. Press Enter to save the current frame; type q + Enter to quit.
+"""Save camera frames for calibration. Run on the robot with the camera node running.
+Press Enter to save the current frame, q + Enter to quit.
 
     python3 capture_frames.py [out_dir]      # default ~/calib_frames
-Watch /camera/image_raw in Foxglove to frame the checkerboard, then press Enter.
 """
 import os
 import sys
@@ -31,12 +31,12 @@ def main():
     node = Grabber()
     threading.Thread(target=rclpy.spin, args=(node,), daemon=True).start()
     n = len([f for f in os.listdir(out) if f.endswith('.jpg')])
-    print(f'Saving to {out} (already {n} frames). Enter = save frame, q = quit.')
+    print(f'saving to {out} ({n} frames so far). Enter = save, q = quit.')
     while True:
         if input().strip().lower() == 'q':
             break
         if node.latest is None:
-            print('No frame received yet; is the camera node running?')
+            print('no frame yet, is the camera node running?')
             continue
         path = os.path.join(out, f'frame_{n:03d}.jpg')
         with open(path, 'wb') as f:

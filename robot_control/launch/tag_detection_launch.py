@@ -1,7 +1,6 @@
-"""Rectify the camera image, then run apriltag_node (family 36h11, ids 0-5). The camera (robot_vision) and
-motor_control are started separately.
+"""Rectify the camera image, then run apriltag_node. The camera and motor_control are started separately.
 
-    ros2 launch robot_control tag_detection_launch.py tag_size:=0.150
+    ros2 launch robot_control tag_detection_launch.py tag_size:=0.16
 """
 import os
 
@@ -21,8 +20,8 @@ def generate_launch_description():
     image_topic = PythonExpression(["'/camera/image_rect' if '", rectify, "' == 'true' else '/camera/image_raw'"])
 
     return LaunchDescription([
-        DeclareLaunchArgument('tag_size', default_value='0.15', description='tag edge length in meters (measure the printout)'),
-        DeclareLaunchArgument('rectify', default_value='true', description='run image_proc rectify before apriltag_node'),
+        DeclareLaunchArgument('tag_size', default_value='0.15', description='tag edge length in meters'),
+        DeclareLaunchArgument('rectify', default_value='true', description='rectify the image before apriltag_node'),
         DeclareLaunchArgument('raw_image', default_value='/camera/image_raw'),
         DeclareLaunchArgument('camera_info', default_value='/camera/camera_info'),
         # image_proc rectify: /camera/image_raw + camera_info -> /camera/image_rect

@@ -1,14 +1,11 @@
-# Parameters for localization_control (and fake_detections, which reads the same tag map and camera mount).
-# Route: (0,0,0) -> (1,0,0) -> (1,2,pi) -> (0,0,0), from the installed hw2_waypoints.txt.
-# All coordinates are in the WORLD frame: origin = where the robot starts, x = its initial facing, y = left.
+# Settings for localization_control. Route (hw2_waypoints.txt): (0,0,0) -> (1,0,0) -> (1,2,pi) -> (0,0,0).
+# All coordinates are in the world frame: origin = where the robot starts, x = its initial facing, y = left.
 /**:
   ros__parameters:
-    # ---- tag map. Tag 5 is detected (apriltag_hw2.yaml) but ignored until it is added to the END of each list below. ----
-    # Measure each tag CENTER from the robot's start pose (center of the robot, between the wheels):
-    # x = ahead along the starting direction, y = left (negative = right), z = height of the center, yaw = direction the
-    # tag faces (pi = facing -x, 0 = facing +x, -1.5708 = facing -y, 1.5708 = facing +y). yaw is not used by the filter.
-    # Every number in the x/y/z/yaw lists MUST have a decimal point (2.0, not 2): ROS rejects mixed int/float lists.
-    # The 5 lists must all have the same length. Check a tag with tf2_echo: camera z = distance ahead of the camera.
+    # ---- tag map ----
+    # Position of each tag center, measured from the start pose: x ahead, y left, z height, yaw = direction the tag faces
+    # (yaw is not used by the filter).
+    # Use decimal points everywhere (2.0, not 2), and keep all five lists the same length.
     tags:
       ids: [0, 1, 2, 3, 4]
       x: [2.0, 1.5, 0.5, 0.0, -0.5]
@@ -16,26 +13,26 @@
       z: [0.12, 0.12, 0.12, 0.12, 0.12]
       yaw: [3.14159, -2.0344, -1.1071, 0.0, 0.7854]
 
-    # ---- camera mount in the vehicle frame (x forward, y left, z up, m); pitch down in degrees (0 = level) ----
+    # ---- camera mount in the vehicle frame (x forward, y left, z up, m), pitch down in degrees ----
     camera:
       x: 0.085
       y: 0.0
       z: 0.125
       pitch_deg: 0.0
-    camera_frame: camera_frame   # frame_id robot_vision puts on its images; apriltag_node's TF parent
-    tag_frame_prefix: tag_       # must match tag.frames in apriltag_hw2.yaml (tag_<id>)
+    camera_frame: camera_frame   # frame name on the camera images
+    tag_frame_prefix: tag_       # tag frames are tag_<id>, as in apriltag_hw2.yaml
 
     # ---- mission ----
     waypoints_file: ''           # '' = installed config/hw2_waypoints.txt
-    max_blind_time: 20.0         # s without a usable tag detection before the robot stops
+    max_blind_time: 20.0         # stop after this many s with no tag
     start_delay: 1.0             # s of zero commands before moving
     rate: 20.0
 
     # ---- controller ----
-    min_cmd: 0.30                # smallest wheel command used while moving (lower values stalled mid-turn)
-    deadband: 0.10               # wheel commands below this do not move the wheel
+    min_cmd: 0.30                # smallest wheel command while moving (lower values stalled)
+    deadband: 0.10               # wheel commands below this do nothing
     turn_tol_deg: 2.0
     reaim_tol_deg: 5.0
     pos_tol: 0.03
-    final_checks: 2              # after the last turn: pause for a tag fix, then re-turn if the heading is still off (0 = off)
-    # log_dir: /home/ubuntu/hw2_logs   # CSV log folder; default is ~/hw2_logs
+    final_checks: 2              # heading re-checks after the last turn
+    # log_dir: /home/ubuntu/hw2_logs   # where the CSV log goes (default ~/hw2_logs)
