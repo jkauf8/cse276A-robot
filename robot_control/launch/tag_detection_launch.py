@@ -20,7 +20,7 @@ def generate_launch_description():
     image_topic = PythonExpression(["'/camera/image_rect' if '", rectify, "' == 'true' else '/camera/image_raw'"])
 
     return LaunchDescription([
-        DeclareLaunchArgument('tag_size', default_value='0.15', description='tag edge length in meters'),
+        DeclareLaunchArgument('tag_size', default_value='0.16', description='tag edge length in meters'),
         DeclareLaunchArgument('rectify', default_value='true', description='rectify the image before apriltag_node'),
         DeclareLaunchArgument('raw_image', default_value='/camera/image_raw'),
         DeclareLaunchArgument('camera_info', default_value='/camera/camera_info'),

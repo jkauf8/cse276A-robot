@@ -3,7 +3,7 @@
   ros__parameters:
     image_transport: raw
     family: 36h11
-    size: 0.15                  # tag edge (black square) in meters
+    size: 0.16                  # tag edge (black square) in meters
     max_hamming: 1
     pose_estimation_method: "pnp"
     detector:

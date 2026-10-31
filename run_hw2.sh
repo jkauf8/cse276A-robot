@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Starts the HW2 nodes on the robot, each in its own tmux window (camera, tags, motors, run).
+# Starts the HW2 nodes on the robot, each in its own tmux window (camera, tags, motors, run) to help us easily running from single script
 #   ./run_hw2.sh          start; the run window waits for Enter
 #   ./run_hw2.sh build    git pull and colcon build, then start
 #   ./run_hw2.sh stop     stop the robot and close everything

@@ -34,11 +34,11 @@ class LocalizationNode(Node):
         self.declare_parameter('waypoints_file', '')  # '' = installed config/hw2_waypoints.txt
         self.declare_parameter('rate', 20.0)  # Hz (motor_control stops the wheels after 0.15 s of silence)
         self.declare_parameter('start_delay', 1.0)  # s of zero commands before moving
-        self.declare_parameter('max_blind_time', 10.0)  # stop after this many s with no tag
+        self.declare_parameter('max_blind_time', 20.0)  # stop after this many s with no tag
         self.declare_parameter('detections_topic', 'detections')
         self.declare_parameter('commands_topic', 'motor_commands')
         self.declare_parameter('tf_max_age', 0.3)  # s; ignore a fallback TF older than this
-        self.declare_parameter('min_cmd', 0.12)  # smallest wheel command while moving
+        self.declare_parameter('min_cmd', 0.30)  # smallest wheel command while moving
         self.declare_parameter('deadband', 0.10)  # wheel commands below this do nothing
         self.declare_parameter('turn_tol_deg', 2.0)
         self.declare_parameter('reaim_tol_deg', 5.0)

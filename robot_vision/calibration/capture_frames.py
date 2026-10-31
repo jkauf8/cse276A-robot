@@ -1,9 +1,4 @@
-#!/usr/bin/env python3
-"""Save camera frames for calibration. Run on the robot with the camera node running.
-Press Enter to save the current frame, q + Enter to quit.
-
-    python3 capture_frames.py [out_dir]      # default ~/calib_frames
-"""
+"""Save camera frames for calibration. Press Enter to save the current frame, q + Enter to quit."""
 import os
 import sys
 import threading

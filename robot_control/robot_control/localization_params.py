@@ -2,6 +2,7 @@
 import math
 import os
 
+import numpy as np
 from ament_index_python.packages import get_package_share_directory
 
 from hw2_localization import ekf as E
@@ -37,5 +38,4 @@ def read_camera(node):
 def load_waypoints(path):
     """Read 'x, y, theta' lines (m, m, rad). Empty path = the installed hw2_waypoints.txt."""
     path = path or os.path.join(get_package_share_directory('robot_control'), 'config', 'hw2_waypoints.txt')
-    with open(path) as f:
-        return [tuple(map(float, ln.replace(',', ' ').split())) for ln in f if ln.strip() and not ln.startswith('#')]
+    return [tuple(row) for row in np.loadtxt(path, delimiter=',', ndmin=2).tolist()]

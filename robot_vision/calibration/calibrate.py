@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-"""Camera calibration from checkerboard JPEGs (needs opencv-python and numpy). Writes camera_parameter.yaml.
-
-    python3 calibrate.py frames/ --cols 8 --rows 6 --square 0.025 --out camera_parameter.yaml
+"""Camera calibration from checkerboard images. Writes camera_parameter.yaml.
 cols and rows are inner corners (a 9x7 board has 8x6), square is the square size in meters.
 """
 import argparse
