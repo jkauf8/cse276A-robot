@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import numpy as np
 
 # Model constants, copied from velocity_control.py
-CMD_PER_MPS = 0.74
+CMD_PER_MPS = 0.66
 TRACK_WIDTH = 0.37
 LEFT_SCALE = 0.9975
 RIGHT_SCALE = 0.9970
