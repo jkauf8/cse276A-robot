@@ -28,6 +28,7 @@ TF_MAX_AGE = 0.3  # s; ignore a fallback TF older than this
 LOG_COLUMNS = ['ros_time', 't', 'x', 'y', 'theta', 'left', 'right', 'n_tags', 'tag_ids', 'wp', 'done_wp', 'phase',
                'sigma_xy', 'n_landmarks', 'accepted', 'rejected']
 LANDMARK_COLUMNS = ['done_wp', 't', 'tag_id', 'x', 'y', 'cov_xx', 'cov_xy', 'cov_yy']
+DETECTION_COLUMNS = ['t', 'tag_id', 'range', 'bearing', 'nis', 'status', 'x', 'y', 'theta', 'phase']
 
 
 class SlamNode(Node):
@@ -43,6 +44,7 @@ class SlamNode(Node):
         self.declare_parameter('max_blind_time', 30.0)  # stop after this many s with no tag
         self.declare_parameter('min_cmd', 0.30)  # smallest wheel command while moving
         self.declare_parameter('deadband', 0.10)  # wheel commands below this do nothing
+        self.declare_parameter('turn_gain', 0.87)  # real turn / commanded turn on this floor (measure it)
         self.declare_parameter('turn_tol_deg', 2.0)
         self.declare_parameter('reaim_tol_deg', 5.0)
         self.declare_parameter('pos_tol', 0.03)
@@ -58,6 +60,7 @@ class SlamNode(Node):
         self.rate = param('rate')
         self.camera_frame, self.prefix = param('camera_frame'), param('tag_frame_prefix')
         self.max_blind, self.start_delay = param('max_blind_time'), param('start_delay')
+        self.turn_gain = param('turn_gain')
         self.slam = EKFSlam(camera=read_camera(self), init_count=param('init_count'), init_spread=param('init_spread'))
         waypoints = load_waypoints(param('waypoints_file') or os.path.join(
             get_package_share_directory('robot_control'), 'config', 'hw3_square.txt'))
@@ -82,10 +85,14 @@ class SlamNode(Node):
         stamp = time.strftime('%Y%m%d_%H%M%S')
         self.log_path = os.path.join(param('log_dir'), f'slam_{stamp}.csv')
         self.landmark_path = os.path.join(param('log_dir'), f'slam_{stamp}_landmarks.csv')
+        self.detection_path = os.path.join(param('log_dir'), f'slam_{stamp}_detections.csv')
         self.log_file, self.landmark_file = open(self.log_path, 'w', newline=''), open(self.landmark_path, 'w', newline='')
+        self.detection_file = open(self.detection_path, 'w', newline='')
         self.log, self.landmark_log = csv.writer(self.log_file), csv.writer(self.landmark_file)
+        self.detection_log = csv.writer(self.detection_file)
         self.log.writerow(LOG_COLUMNS)
         self.landmark_log.writerow(LANDMARK_COLUMNS)
+        self.detection_log.writerow(DETECTION_COLUMNS)
         self.create_timer(1.0 / self.rate, self.tick)
         self.get_logger().info(f'{len(waypoints)} waypoints; logging to {self.log_path}')
 
@@ -133,6 +140,10 @@ class SlamNode(Node):
                     keep.append((stamp, tag_id))  # TF may still arrive
                 continue
             self.slam.update(E.Detection(tag_id, t_cam), at=self.pose_at(stamp.nanoseconds * 1e-9))
+            r, b, nis, status = self.slam.last
+            x, y, theta = self.slam.pose
+            self.detection_log.writerow([f'{time.monotonic() - self.t_start:.3f}', tag_id, f'{r:.3f}', f'{b:.4f}',
+                                         f'{nis:.2f}', status, f'{x:.4f}', f'{y:.4f}', f'{theta:.4f}', self.ctrl.phase])
             seen.append(tag_id)
         self.pending = keep
         return seen
@@ -154,7 +165,8 @@ class SlamNode(Node):
             return
         now = time.monotonic()
         dt, self.t_prev = min(now - self.t_prev, 0.2), now
-        self.slam.predict(*E.cmds_to_vw(*self.cmd), dt)  # last tick's command acted during dt
+        v, w = E.cmds_to_vw(*self.cmd)  # last tick's command acted during dt
+        self.slam.predict(v, w * self.turn_gain, dt)  # the robot turns less than commanded
         ros_s = self.get_clock().now().nanoseconds * 1e-9
         self.history.append((ros_s, *self.slam.pose))
         while self.history and ros_s - self.history[0][0] > HISTORY:
@@ -189,8 +201,10 @@ class SlamNode(Node):
         self.send(0.0, 0.0)
         time.sleep(0.05)  # let the stop message go out
         self.save_map(time.monotonic() - self.t_start)
+        self.detection_file.flush()
         self.log_file.close()
         self.landmark_file.close()
+        self.detection_file.close()
         x, y, theta = self.slam.pose
         self.get_logger().info(
             f'finished ({self.stop_reason or "interrupted"}): {len(self.slam.index)} landmarks {sorted(self.slam.index)}, '

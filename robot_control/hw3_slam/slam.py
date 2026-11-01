@@ -28,6 +28,7 @@ class EKFSlam:
         self.guesses = {}  # tag id -> landmark guesses from the last detections, tag not in the map yet
         self.accepted = 0
         self.rejected = 0
+        self.last = None  # what happened to the latest detection: (range, bearing, NIS, status), for logging
 
     @property
     def pose(self):
@@ -76,11 +77,14 @@ class EKFSlam:
         at: robot pose from when the image was taken, used for the expected measurement if the detection is late."""
         z_r, z_b = E.camera_range_bearing(det.t_cam, self.r_vc)
         if z_r < 0.05:
+            self.last = (z_r, z_b, float('nan'), 'too close')
             return False
         pose = self.pose if at is None else list(at)
         R = np.diag([(self.n['sig_r_abs'] + self.n['sig_r_rel'] * z_r) ** 2, self.n['sig_bearing'] ** 2])
         if det.tag_id not in self.index:
-            return self._new_landmark(det.tag_id, pose, z_r, z_b, R)
+            added = self._new_landmark(det.tag_id, pose, z_r, z_b, R)
+            self.last = (z_r, z_b, float('nan'), 'new' if added else 'waiting')
+            return added
 
         i = self.index[det.tag_id]
         h_r, h_b, H_pose = self.expected(pose, self.x[i:i + 2])
@@ -90,8 +94,10 @@ class EKFSlam:
         innovation = np.array([z_r - h_r, E.wrap(z_b - h_b)])
         S = H @ self.P @ H.T + R
         S_inv = np.linalg.inv(S)
-        if innovation @ S_inv @ innovation > self.n['gate']:
+        nis = innovation @ S_inv @ innovation  # normalized innovation squared
+        if nis > self.n['gate']:
             self.rejected += 1
+            self.last = (z_r, z_b, nis, 'rejected')
             return False
         K = self.P @ H.T @ S_inv
         self.x = self.x + K @ innovation
@@ -99,6 +105,7 @@ class EKFSlam:
         I_KH = np.eye(len(self.x)) - K @ H
         self.P = I_KH @ self.P @ I_KH.T + K @ R @ K.T  # Joseph form
         self.accepted += 1
+        self.last = (z_r, z_b, nis, 'used')
         return True
 
     def _new_landmark(self, tag_id, pose, z_r, z_b, R):
