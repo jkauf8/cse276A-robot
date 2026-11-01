@@ -1,0 +1,12 @@
+# Measured landmark positions (m) for the HW3 course, in the ground-truth frame:
+# origin = bottom-left corner of the square, x along the bottom wall, y along the left wall.
+# PLACEHOLDER: these are the planned positions for an 8 ft (2.4384 m) room. Replace them with the tape-measured values.
+landmarks:
+  0: [0.8128, 0.0]
+  1: [1.6256, 0.0]
+  2: [2.4384, 0.8128]
+  3: [2.4384, 1.6256]
+  4: [1.6256, 2.4384]
+  5: [0.8128, 2.4384]
+  6: [0.0, 1.6256]
+  7: [0.0, 0.8128]

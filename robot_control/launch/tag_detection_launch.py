@@ -21,6 +21,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         DeclareLaunchArgument('tag_size', default_value='0.16', description='tag edge length in meters'),
+        DeclareLaunchArgument('apriltag_params', default_value=params, description='apriltag_node settings file'),
         DeclareLaunchArgument('rectify', default_value='true', description='rectify the image before apriltag_node'),
         DeclareLaunchArgument('raw_image', default_value='/camera/image_raw'),
         DeclareLaunchArgument('camera_info', default_value='/camera/camera_info'),
@@ -35,5 +36,5 @@ def generate_launch_description():
             output='screen'),
         Node(package='apriltag_ros', executable='apriltag_node', name='apriltag', output='screen',
              remappings=[('image_rect', image_topic), ('camera_info', LaunchConfiguration('camera_info'))],
-             parameters=[params, {'size': ParameterValue(LaunchConfiguration('tag_size'), value_type=float)}]),
+             parameters=[LaunchConfiguration('apriltag_params'), {'size': ParameterValue(LaunchConfiguration('tag_size'), value_type=float)}]),
     ])

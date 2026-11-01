@@ -6,6 +6,8 @@ robot_control/hw2_localization/run_sim.py
 robot_control/hw2_localization/summary.md
 robot_control/hw2_localization/out/
 robot_control/robot_control/fake_detections.py
+robot_control/hw3_slam/sim_slam.py
+robot_control/hw3_slam/check_slam.py
 
 # LaTeX build files and macOS junk
 *.aux
@@ -15,3 +17,16 @@ robot_control/robot_control/fake_detections.py
 *.fdb_latexmk
 *.synctex.gz
 .DS_Store
+
+# local notes, reports and tool files (kept locally, not tracked)
+.claude/
+CLAUDE.md
+skills-lock.json
+HWs/
+internal_for_us/
+
+# old HW2 test runs (the best run, already tracked, stays)
+logs/localization_20261022_032938.csv
+logs/localization_20261027_022506.csv
+logs/localization_20261027_023645.csv
+logs/trajectory.png
