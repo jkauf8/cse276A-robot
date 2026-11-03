@@ -3,8 +3,9 @@
 /**:
   ros__parameters:
     # ---- camera mount in the vehicle frame (x forward, y left, z up, m), pitch down in degrees ----
+    # x: the lens is about 1 cm ahead of the wheel midpoint (HW2 used 0.085; the HW3 maps fit better with a small value)
     camera:
-      x: 0.085
+      x: 0.01
       y: 0.0
       z: 0.125
       pitch_deg: 0.0
@@ -15,6 +16,8 @@
     waypoints_file: ''           # '' = installed config/hw3_square.txt (slam_launch.py sets it)
     max_blind_time: 30.0         # stop after this many s with no tag
     start_delay: 1.0             # s of zero commands before moving
+    start_landmarks: 2           # stay still until this many tags are in the map (anchors the map to the start pose)
+    start_wait: 15.0             # ...but wait at most this many s
     rate: 20.0
 
     # ---- controller (same values as HW2) ----

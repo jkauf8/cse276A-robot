@@ -34,13 +34,15 @@ DETECTION_COLUMNS = ['t', 'tag_id', 'range', 'bearing', 'nis', 'status', 'x', 'y
 class SlamNode(Node):
     def __init__(self):
         super().__init__('slam_control')
-        for key, val in (('x', 0.085), ('y', 0.0), ('z', 0.125), ('pitch_deg', 0.0)):
+        for key, val in (('x', 0.01), ('y', 0.0), ('z', 0.125), ('pitch_deg', 0.0)):
             self.declare_parameter(f'camera.{key}', val)  # camera mount in the vehicle frame
         self.declare_parameter('camera_frame', 'camera_frame')  # frame name on the camera images
         self.declare_parameter('tag_frame_prefix', 'tag_')  # tag frames are named <prefix><id>
         self.declare_parameter('waypoints_file', '')  # '' = installed config/hw3_square.txt
         self.declare_parameter('rate', 20.0)  # Hz (motor_control stops the wheels after 0.15 s of silence)
         self.declare_parameter('start_delay', 1.0)  # s of zero commands before moving
+        self.declare_parameter('start_landmarks', 2)  # tags that must be in the map before the robot moves
+        self.declare_parameter('start_wait', 15.0)  # s to wait for them at most
         self.declare_parameter('max_blind_time', 30.0)  # stop after this many s with no tag
         self.declare_parameter('min_cmd', 0.30)  # smallest wheel command while moving
         self.declare_parameter('deadband', 0.10)  # wheel commands below this do nothing
@@ -60,6 +62,7 @@ class SlamNode(Node):
         self.rate = param('rate')
         self.camera_frame, self.prefix = param('camera_frame'), param('tag_frame_prefix')
         self.max_blind, self.start_delay = param('max_blind_time'), param('start_delay')
+        self.start_landmarks, self.start_wait = param('start_landmarks'), param('start_wait')
         self.turn_gain = param('turn_gain')
         self.slam = EKFSlam(camera=read_camera(self), init_count=param('init_count'), init_spread=param('init_spread'))
         waypoints = load_waypoints(param('waypoints_file') or os.path.join(
@@ -176,7 +179,9 @@ class SlamNode(Node):
         if seen:
             self.last_seen = now
         t = now - self.t_start
-        if t < self.start_delay:
+        # stay still until a few tags are mapped from the known start pose, so the map has an anchor
+        waiting = t < self.start_delay or (len(self.slam.index) < self.start_landmarks and t < self.start_delay + self.start_wait)
+        if waiting:
             self.last_seen = now  # the no-tag timer starts when the robot starts moving
             cmd = (0.0, 0.0)
         elif now - self.last_seen > self.max_blind:
