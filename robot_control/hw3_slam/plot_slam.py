@@ -24,19 +24,33 @@ def load_truth(path):
         return {int(i): np.array(p, dtype=float) for i, p in yaml.safe_load(f)['landmarks'].items()}
 
 
+def fit_error(est, true):
+    """Mean error (cm) after the best rotation and shift of the estimated map onto the true one. This leaves out the
+    error from a start pose that was placed or measured a little differently from what we used."""
+    est, true = np.asarray(est), np.asarray(true)
+    ce, ct = est.mean(axis=0), true.mean(axis=0)
+    U, _, Vt = np.linalg.svd((est - ce).T @ (true - ct))
+    R = (U @ np.diag([1, np.sign(np.linalg.det(Vt.T @ U.T))]) @ Vt).T
+    return np.linalg.norm((R @ (est - ce).T).T + ct - true, axis=1).mean() * 100
+
+
 def print_scores(landmarks, start, truth, sides):
     """Error of each landmark after every finished loop. The estimate is in the start frame: rotate and shift it."""
     R, t0 = rot(start[2]), np.array(start[:2])
-    print(f"{'after loop':>10} {'landmarks':>10} {'mean error (cm)':>16} {'worst (cm)':>11}")
+    print(f"{'after loop':>10} {'landmarks':>10} {'mean error (cm)':>16} {'worst (cm)':>11} {'after best fit (cm)':>20} "
+          f"{'mean sigma (cm)':>16}")
     loops = sorted(set(landmarks.done_wp[landmarks.done_wp % sides == 0]) - {0})
     last = landmarks.done_wp.max()
     for wp in loops + ([last] if last not in loops else []):
         snap = landmarks[landmarks.done_wp == wp]
         snap = snap[snap.t == snap.t.max()].drop_duplicates('tag_id', keep='last')
-        err = [np.linalg.norm(R @ [r.x, r.y] + t0 - truth[r.tag_id]) * 100 for r in snap.itertuples() if r.tag_id in truth]
+        rows = [r for r in snap.itertuples() if r.tag_id in truth]
+        err = [np.linalg.norm(R @ [r.x, r.y] + t0 - truth[r.tag_id]) * 100 for r in rows]
+        sigma = [math.sqrt((r.cov_xx + r.cov_yy) / 2) * 100 for r in rows]  # per-axis 1-sigma of the landmark estimate
         label = f'{wp // sides}' if wp in loops else 'end'
         if err:
-            print(f'{label:>10} {len(err):>10} {np.mean(err):>16.1f} {max(err):>11.1f}')
+            fit = fit_error([[r.x, r.y] for r in rows], [truth[r.tag_id] for r in rows]) if len(rows) > 2 else float('nan')
+            print(f'{label:>10} {len(err):>10} {np.mean(err):>16.1f} {max(err):>11.1f} {fit:>20.1f} {np.mean(sigma):>16.1f}')
     print('\nfinal map: tag, estimate (x, y), true (x, y), error')
     for r in snap.itertuples():
         est = R @ [r.x, r.y] + t0

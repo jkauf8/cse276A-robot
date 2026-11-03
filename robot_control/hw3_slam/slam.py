@@ -13,6 +13,7 @@ from hw2_localization import ekf as E
 
 INIT_COUNT = 3  # detections that must agree before a new tag is added to the map
 INIT_SPREAD = 0.30  # they agree if each landmark guess is within this distance of their mean (m)
+GATE = 100.0  # reject a detection only if it is wildly inconsistent (HW2 used 20, which locked the filter out late in a run)
 
 
 class EKFSlam:
@@ -23,7 +24,7 @@ class EKFSlam:
         self.index = {}  # tag id -> where its x sits in the state (3, 5, 7, ...)
         self.cam_x, self.cam_y, self.cam_z, pitch = camera
         self.r_vc = E.rotation_vc(pitch)
-        self.n = {**E.NOISE, **(noise or {})}
+        self.n = {**E.NOISE, 'gate': GATE, **(noise or {})}
         self.init_count, self.init_spread = init_count, init_spread
         self.guesses = {}  # tag id -> landmark guesses from the last detections, tag not in the map yet
         self.accepted = 0
