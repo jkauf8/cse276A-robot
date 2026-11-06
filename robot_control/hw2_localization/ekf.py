@@ -9,10 +9,10 @@ from dataclasses import dataclass
 import numpy as np
 
 # Model constants, copied from velocity_control.py
-CMD_PER_MPS = 0.66
-TRACK_WIDTH = 0.37
-LEFT_SCALE = 0.9975
-RIGHT_SCALE = 0.9970
+CMD_PER_MPS = 0.706
+TRACK_WIDTH = 0.316
+LEFT_SCALE = 1.0160
+RIGHT_SCALE = 0.9810
 
 # Camera mount in the vehicle frame: (x forward, y left, z up, pitch down in rad)
 CAMERA = (0.085, 0.0, 0.125, 0.0)

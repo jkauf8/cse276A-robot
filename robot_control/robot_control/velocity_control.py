@@ -11,10 +11,10 @@ from std_msgs.msg import Float32MultiArray
 
 # ---- Calibration constants ----
 # new robot (office carpet)
-CMD_PER_MPS = 0.687  # motor command per m/s of wheel speed
-TRACK_WIDTH = 0.315  # tuned so the turn command is about 0.38; sets the turn angle
-LEFT_SCALE = 1.0135  # multiplier for left wheel motor command
-RIGHT_SCALE = 0.9835  # multiplier for right wheel motor command
+CMD_PER_MPS = 0.706  # motor command per m/s of wheel speed
+TRACK_WIDTH = 0.316  # tuned so the turn command is about 0.38; sets the turn angle
+LEFT_SCALE = 1.0160  # multiplier for left wheel motor command
+RIGHT_SCALE = 0.9810  # multiplier for right wheel motor command
 CRUISE_SPEED = 0.55  # driving speed in m/s
 TURN_RATE = 3.49  # spin speed in rad/s (measured: 9 messages at 20 Hz = 90 deg)
 TURN_SIGN = 1  # turn direction (flip to -1 if the robot turns the wrong way)
