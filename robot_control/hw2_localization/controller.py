@@ -22,7 +22,7 @@ FINAL_CHECKS = 2  # heading re-checks after the last turn
 class Controller:
     def __init__(self, waypoints, wheel_cmds, cruise_speed, turn_rate, pause, turn_sign=1,
                  min_cmd=MIN_CMD, deadband=0.0, turn_tol=TURN_TOL, reaim_tol=REAIM_TOL, pos_tol=POS_TOL,
-                 final_checks=FINAL_CHECKS):
+                 final_checks=FINAL_CHECKS, min_turn_cmd=None):
         self.waypoints, self.wheel_cmds = waypoints, wheel_cmds
         self.cruise, self.turn_rate, self.pause, self.turn_sign = cruise_speed, turn_rate, pause, turn_sign
         self.turn_tol, self.reaim_tol, self.pos_tol = turn_tol, reaim_tol, pos_tol
@@ -30,7 +30,9 @@ class Controller:
         floor = max(min_cmd, deadband)  # commands below the deadband do nothing
         # slowest speeds that still give a wheel command of floor
         self.v_min = floor / (wheel_cmds(0.1, 0.0)[0] / 0.1)
-        self.w_min = floor / (wheel_cmds(0.0, 0.1)[1] / 0.1)
+        # spins have their own floor: weak spin commands turn the robot much less than the model says
+        # (min_turn_cmd=None: same floor as driving)
+        self.w_min = (floor if min_turn_cmd is None else max(min_turn_cmd, deadband)) / (wheel_cmds(0.0, 0.1)[1] / 0.1)
         self.i = 0  # current waypoint
         self.phase = 'face'  # face -> drive -> final; 'settle' is the pause between moves
         self.after = None  # phase to start after the pause

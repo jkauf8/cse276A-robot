@@ -24,8 +24,9 @@
     min_cmd: 0.30                # smallest wheel command while moving (lower values stalled)
     deadband: 0.10               # wheel commands below this do nothing
     turn_gain: 1.0              # real turn / commanded turn on this floor (from HW2 logs; measure it with the turn test)
-    turn_tol_deg: 2.0
-    reaim_tol_deg: 5.0
+    min_turn_cmd: 0.38           # smallest spin command: the calibrated 90 deg turn used 0.38; at 0.30 the robot turned ~half as much
+    turn_tol_deg: 5.0            # one 20 Hz tick turns ~10 deg at the calibrated rate, so 2 deg could not be hit and the robot dithered
+    reaim_tol_deg: 12.0          # must stay above turn_tol_deg, or a finished turn would be redone at once
     pos_tol: 0.03
     final_checks: 2              # heading re-checks after the last turn
 

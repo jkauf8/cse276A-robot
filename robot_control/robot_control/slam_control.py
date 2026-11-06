@@ -46,6 +46,7 @@ class SlamNode(Node):
         self.declare_parameter('max_blind_time', 30.0)  # stop after this many s with no tag
         self.declare_parameter('min_cmd', 0.30)  # smallest wheel command while moving
         self.declare_parameter('deadband', 0.10)  # wheel commands below this do nothing
+        self.declare_parameter('min_turn_cmd', 0.0)  # smallest wheel command while spinning (0 = same as min_cmd)
         self.declare_parameter('turn_gain', 0.87)  # real turn / commanded turn on this floor (measure it)
         self.declare_parameter('turn_tol_deg', 2.0)
         self.declare_parameter('reaim_tol_deg', 5.0)
@@ -70,7 +71,8 @@ class SlamNode(Node):
         self.ctrl = Controller(waypoints, vc.wheel_cmds, vc.CRUISE_SPEED, vc.TURN_RATE, vc.PAUSE, vc.TURN_SIGN,
                                min_cmd=param('min_cmd'), deadband=param('deadband'),
                                turn_tol=math.radians(param('turn_tol_deg')), reaim_tol=math.radians(param('reaim_tol_deg')),
-                               pos_tol=param('pos_tol'), final_checks=param('final_checks'))
+                               pos_tol=param('pos_tol'), final_checks=param('final_checks'),
+                               min_turn_cmd=param('min_turn_cmd') or None)
 
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
