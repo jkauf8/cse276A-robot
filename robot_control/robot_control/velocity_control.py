@@ -10,17 +10,24 @@ from rclpy.signals import SignalHandlerOptions
 from std_msgs.msg import Float32MultiArray
 
 # ---- Calibration constants ----
-# office carpet
-CMD_PER_MPS = 0.66  # motor command per m/s of wheel speed
-TRACK_WIDTH = 0.37  # wheel spacing, which sets the turn angle
-LEFT_SCALE = 0.9975  # multiplier for left wheel motor command
-RIGHT_SCALE = 0.9970  # multiplier for right wheel motor command
+# new robot (office carpet)
+CMD_PER_MPS = 0.687  # motor command per m/s of wheel speed
+TRACK_WIDTH = 0.315  # tuned so the turn command is about 0.38; sets the turn angle
+LEFT_SCALE = 1.0135  # multiplier for left wheel motor command
+RIGHT_SCALE = 0.9835  # multiplier for right wheel motor command
 CRUISE_SPEED = 0.55  # driving speed in m/s
-TURN_RATE = 2.25  # spin speed in rad/s
+TURN_RATE = 3.49  # spin speed in rad/s (measured: 9 messages at 20 Hz = 90 deg)
 TURN_SIGN = 1  # turn direction (flip to -1 if the robot turns the wrong way)
 PAUSE = 1  # seconds stopped between moves
 RATE = 20.0  # Hz publish rate; motor_control stops the wheels after 0.15 s of silence
 CMD_LIMIT = 0.5  # motor_control clips each wheel to +/-0.5
+
+# old robot, office carpet
+# CMD_PER_MPS = 0.66
+# TRACK_WIDTH = 0.37
+# LEFT_SCALE = 0.9975
+# RIGHT_SCALE = 0.9970
+# TURN_RATE = 2.25
 
 # Geisel carpet
 # CMD_PER_MPS = 0.74  # motor command per m/s of wheel speed
