@@ -1,2 +1,0 @@
-hw2_localization
-robot_control

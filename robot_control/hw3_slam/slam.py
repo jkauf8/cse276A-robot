@@ -13,7 +13,7 @@ from hw2_localization import ekf as E
 
 INIT_COUNT = 3  # detections that must agree before a new tag is added to the map
 INIT_SPREAD = 0.30  # they agree if each landmark guess is within this distance of their mean (m)
-GATE = 100.0  # reject a detection only if it is wildly inconsistent (HW2 used 20, which locked the filter out late in a run)
+GATE = 100.0  # reject a detection if its normalized innovation squared is above this (loose: only gross outliers)
 
 
 class EKFSlam:

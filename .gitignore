@@ -30,3 +30,8 @@ logs/localization_20261022_032938.csv
 logs/localization_20261027_022506.csv
 logs/localization_20261027_023645.csv
 logs/trajectory.png
+
+# colcon build output
+build/
+install/
+log/

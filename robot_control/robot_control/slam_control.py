@@ -46,10 +46,10 @@ class SlamNode(Node):
         self.declare_parameter('max_blind_time', 30.0)  # stop after this many s with no tag
         self.declare_parameter('min_cmd', 0.30)  # smallest wheel command while moving
         self.declare_parameter('deadband', 0.10)  # wheel commands below this do nothing
-        self.declare_parameter('min_turn_cmd', 0.0)  # smallest wheel command while spinning (0 = same as min_cmd)
-        self.declare_parameter('turn_gain', 0.87)  # real turn / commanded turn on this floor (measure it)
-        self.declare_parameter('turn_tol_deg', 2.0)
-        self.declare_parameter('reaim_tol_deg', 5.0)
+        self.declare_parameter('min_turn_cmd', 0.38)  # smallest wheel command while spinning (the calibrated 90 deg turn used 0.38)
+        self.declare_parameter('turn_gain', 1.0)  # real turn / commanded turn (1 = the turn calibration is exact)
+        self.declare_parameter('turn_tol_deg', 5.0)  # a turn is done below this heading error
+        self.declare_parameter('reaim_tol_deg', 12.0)  # must stay above turn_tol_deg
         self.declare_parameter('pos_tol', 0.03)
         self.declare_parameter('final_checks', 2)  # heading re-checks after the last turn
         self.declare_parameter('init_count', 3)  # detections that must agree before a tag joins the map
@@ -72,7 +72,7 @@ class SlamNode(Node):
                                min_cmd=param('min_cmd'), deadband=param('deadband'),
                                turn_tol=math.radians(param('turn_tol_deg')), reaim_tol=math.radians(param('reaim_tol_deg')),
                                pos_tol=param('pos_tol'), final_checks=param('final_checks'),
-                               min_turn_cmd=param('min_turn_cmd') or None)
+                               min_turn_cmd=param('min_turn_cmd'))
 
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
@@ -171,7 +171,7 @@ class SlamNode(Node):
         now = time.monotonic()
         dt, self.t_prev = min(now - self.t_prev, 0.2), now
         v, w = E.cmds_to_vw(*self.cmd)  # last tick's command acted during dt
-        self.slam.predict(v, w * self.turn_gain, dt)  # the robot turns less than commanded
+        self.slam.predict(v, w * self.turn_gain, dt)  # scale the commanded turn by turn_gain
         ros_s = self.get_clock().now().nanoseconds * 1e-9
         self.history.append((ros_s, *self.slam.pose))
         while self.history and ros_s - self.history[0][0] > HISTORY:

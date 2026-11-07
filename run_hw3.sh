@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Starts the HW3 (SLAM) nodes on the robot, each in its own tmux window (camera, tags, motors, run) to help us easily running from single script
+# Starts the HW3 (SLAM) nodes on the robot, each in its own tmux window (camera, tags, motors, run), from one script.
 #   ./run_hw3.sh          start the square path; the run window waits for Enter
 #   SHAPE=octagon ./run_hw3.sh   same with the octagon path
 #   ./run_hw3.sh build    git pull and colcon build, then start

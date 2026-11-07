@@ -1,6 +1,7 @@
 """Rectify the camera image, then run apriltag_node. The camera and motor_control are started separately.
 
     ros2 launch robot_control tag_detection_launch.py tag_size:=0.16
+    ros2 launch robot_control tag_detection_launch.py apriltag_params:=<apriltag_hw3.yaml>   # HW3 tag ids 0-7
 """
 import os
 

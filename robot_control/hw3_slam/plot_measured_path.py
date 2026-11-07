@@ -1,6 +1,6 @@
 """Plot where the tags say the robot was, next to the path the filter believed and the ideal path.
 The logged x, y is the filter's belief (the controller steers it onto each corner). Whenever two or more tags are seen at
-once, the known tag positions give the robot's real pose. Runs on a laptop. Needs pandas, matplotlib and pyyaml.
+once, the known tag positions give the robot's real pose. Runs on a laptop. Needs pandas, matplotlib, pyyaml and scipy.
 
     python3 -m hw3_slam.plot_measured_path slam_X.csv slam_X_detections.csv --truth config/hw3_ground_truth.yaml --shape octagon
 """
@@ -11,6 +11,7 @@ import os
 import numpy as np
 import pandas as pd
 from matplotlib.figure import Figure
+from scipy.optimize import least_squares
 
 from hw3_slam import paths
 from hw3_slam.plot_slam import load_truth, rot
@@ -30,15 +31,8 @@ def solve_pose(rows, truth, cam_x, guess):
             out += [math.hypot(dx, dy) - r.range, (math.atan2(dy, dx) - th - r.bearing + math.pi) % (2 * math.pi) - math.pi]
         return np.array(out)
 
-    p = np.array(guess, dtype=float)
-    for _ in range(30):  # Gauss-Newton with a numerical Jacobian
-        f = residual(p)
-        J = np.array([(residual(p + e) - f) / 1e-6 for e in np.eye(3) * 1e-6]).T
-        step = np.linalg.lstsq(J, -f, rcond=None)[0]
-        p += step
-        if np.abs(step).max() < 1e-8:
-            break
-    return p, np.abs(residual(p)).max()
+    fit = least_squares(residual, guess)
+    return fit.x, np.abs(fit.fun).max()
 
 
 def distance_to_outline(p, corners):

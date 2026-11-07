@@ -18,14 +18,6 @@ def polygon(sides, length, loops=1):
     return waypoints
 
 
-def square(n, loops=1):
-    return polygon(4, n, loops)
-
-
-def octagon(m, loops=1):
-    return polygon(8, m, loops)
-
-
 def write(path, waypoints):
     with open(path, 'w') as f:
         f.write('# x, y, theta per line (m, m, rad), relative to the start pose\n')
@@ -34,5 +26,5 @@ def write(path, waypoints):
 
 if __name__ == '__main__':
     config = os.path.join(os.path.dirname(__file__), '..', 'config')
-    write(os.path.join(config, 'hw3_square.txt'), square(0.9144, loops=3))  # 3 ft
-    write(os.path.join(config, 'hw3_octagon.txt'), octagon(0.4572, loops=3))  # 1.5 ft
+    write(os.path.join(config, 'hw3_square.txt'), polygon(4, 0.9144, loops=3))  # 3 ft
+    write(os.path.join(config, 'hw3_octagon.txt'), polygon(8, 0.4572, loops=3))  # 1.5 ft

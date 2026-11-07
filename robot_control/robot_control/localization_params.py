@@ -1,4 +1,4 @@
-"""Read the tag map, camera mount and waypoints for localization_control (values come from localization_full.yaml)."""
+"""Read the tag map, camera mount and waypoints for localization_control (HW2) and slam_control (HW3)."""
 import math
 import os
 

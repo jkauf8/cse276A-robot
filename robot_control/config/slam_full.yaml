@@ -3,7 +3,7 @@
 /**:
   ros__parameters:
     # ---- camera mount in the vehicle frame (x forward, y left, z up, m), pitch down in degrees ----
-    # x: the lens is about 1 cm ahead of the wheel midpoint (HW2 used 0.085; the HW3 maps fit better with a small value)
+    # x: the lens is about 1 cm ahead of the wheel midpoint
     camera:
       x: 0.01
       y: 0.0
@@ -20,13 +20,13 @@
     start_wait: 15.0             # ...but wait at most this many s
     rate: 20.0
 
-    # ---- controller (same values as HW2) ----
-    min_cmd: 0.30                # smallest wheel command while moving (lower values stalled)
+    # ---- controller (the HW2 controller) ----
+    min_cmd: 0.30                # smallest wheel command while moving
     deadband: 0.10               # wheel commands below this do nothing
-    turn_gain: 1.0              # real turn / commanded turn on this floor (from HW2 logs; measure it with the turn test)
-    min_turn_cmd: 0.38           # smallest spin command: the calibrated 90 deg turn used 0.38; at 0.30 the robot turned ~half as much
-    turn_tol_deg: 5.0            # one 20 Hz tick turns ~10 deg at the calibrated rate, so 2 deg could not be hit and the robot dithered
-    reaim_tol_deg: 12.0          # must stay above turn_tol_deg, or a finished turn would be redone at once
+    turn_gain: 1.0               # real turn / commanded turn (1 = the turn calibration in velocity_control.py is exact)
+    min_turn_cmd: 0.38           # smallest wheel command while spinning (the 90 deg turn was calibrated at 0.38)
+    turn_tol_deg: 5.0            # a turn is done below this heading error (one 20 Hz tick turns ~10 deg)
+    reaim_tol_deg: 12.0          # while driving, stop and re-aim above this heading error (keep it above turn_tol_deg)
     pos_tol: 0.03
     final_checks: 2              # heading re-checks after the last turn
 

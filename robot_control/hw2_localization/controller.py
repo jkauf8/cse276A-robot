@@ -30,8 +30,7 @@ class Controller:
         floor = max(min_cmd, deadband)  # commands below the deadband do nothing
         # slowest speeds that still give a wheel command of floor
         self.v_min = floor / (wheel_cmds(0.1, 0.0)[0] / 0.1)
-        # spins have their own floor: weak spin commands turn the robot much less than the model says
-        # (min_turn_cmd=None: same floor as driving)
+        # spins have their own floor (min_turn_cmd=None: same floor as driving)
         self.w_min = (floor if min_turn_cmd is None else max(min_turn_cmd, deadband)) / (wheel_cmds(0.0, 0.1)[1] / 0.1)
         self.i = 0  # current waypoint
         self.phase = 'face'  # face -> drive -> final; 'settle' is the pause between moves
