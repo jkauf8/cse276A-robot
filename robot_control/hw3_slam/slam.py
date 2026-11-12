@@ -22,7 +22,7 @@ class EKFSlam:
         self.x = np.array(pose, dtype=float)
         self.P = np.diag(np.square(sigma0))
         self.index = {}  # tag id -> where its x sits in the state (3, 5, 7, ...)
-        self.cam_x, self.cam_y, self.cam_z, pitch = camera
+        self.cam_x, self.cam_y, _, pitch = camera  # the camera height is not needed: the filter works in the floor plane
         self.r_vc = E.rotation_vc(pitch)
         self.n = {**E.NOISE, 'gate': GATE, **(noise or {})}
         self.init_count, self.init_spread = init_count, init_spread

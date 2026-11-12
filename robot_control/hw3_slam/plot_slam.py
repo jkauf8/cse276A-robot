@@ -1,7 +1,8 @@
 """Plot the SLAM trajectory and landmark map with their covariance, and score the map against the measured ground truth.
 Runs on a laptop, not on the robot. Needs pandas, matplotlib and pyyaml.
+--start is the measured start pose in the truth frame: x (m), y (m), heading (deg, 90 = facing the top wall).
 
-    python3 -m hw3_slam.plot_slam slam_X.csv slam_X_landmarks.csv --truth config/hw3_ground_truth.yaml --start 1.2 0.8 25
+    python3 -m hw3_slam.plot_slam slam_X.csv slam_X_landmarks.csv --truth config/hw3_ground_truth.yaml --start 1.778 0.991 90
     python3 -m hw3_slam.plot_slam --truth config/hw3_ground_truth.yaml      # only the ground-truth sketch
 """
 import argparse
@@ -55,7 +56,8 @@ def print_scores(landmarks, start, truth, sides):
     for r in snap.itertuples():
         est = R @ [r.x, r.y] + t0
         true = truth[r.tag_id]
-        print(f'{r.tag_id:>3}  ({est[0]:.3f}, {est[1]:.3f})  ({true[0]:.3f}, {true[1]:.3f})  {np.linalg.norm(est - true) * 100:.1f} cm')
+        print(f'{r.tag_id:>3}  ({est[0]:.3f}, {est[1]:.3f})  ({true[0]:.3f}, {true[1]:.3f})  '
+              f'{np.linalg.norm(est - true) * 100:.1f} cm')
     missing = sorted(set(truth) - set(snap.tag_id))
     if missing:
         print('not in the map:', missing)

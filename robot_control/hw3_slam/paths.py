@@ -1,9 +1,17 @@
 """Waypoint lists for the HW3 paths, relative to the start pose (0, 0, 0 = where the robot is placed, facing +x).
-Each waypoint's heading is the direction of the next leg, so the robot is already facing it when the next move starts."""
+Each waypoint's heading is the direction of the next leg, so the robot is already facing it when the next move starts.
+
+    python3 -m hw3_slam.paths      # from robot_control/: rewrite config/hw3_square.txt and config/hw3_octagon.txt
+"""
 import math
 import os
 
 from hw2_localization.ekf import wrap
+
+FT = 0.3048  # m per ft
+CORNERS = {'square': 4, 'octagon': 8}  # waypoints per loop
+SIDE = {'square': 0.9144, 'octagon': 0.4572}  # side length of each path (m): 3 ft and 1.5 ft
+LOOPS = 3
 
 
 def polygon(sides, length, loops=1):
@@ -26,5 +34,5 @@ def write(path, waypoints):
 
 if __name__ == '__main__':
     config = os.path.join(os.path.dirname(__file__), '..', 'config')
-    write(os.path.join(config, 'hw3_square.txt'), polygon(4, 0.9144, loops=3))  # 3 ft
-    write(os.path.join(config, 'hw3_octagon.txt'), polygon(8, 0.4572, loops=3))  # 1.5 ft
+    for shape, corners in CORNERS.items():
+        write(os.path.join(config, f'hw3_{shape}.txt'), polygon(corners, SIDE[shape], loops=LOOPS))

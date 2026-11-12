@@ -31,6 +31,14 @@ LANDMARK_COLUMNS = ['done_wp', 't', 'tag_id', 'x', 'y', 'cov_xx', 'cov_xy', 'cov
 DETECTION_COLUMNS = ['t', 'tag_id', 'range', 'bearing', 'nis', 'status', 'x', 'y', 'theta', 'phase']
 
 
+def open_csv(path, columns):
+    """Open path for writing, write the header row, and return (file, csv writer)."""
+    f = open(path, 'w', newline='')
+    writer = csv.writer(f)
+    writer.writerow(columns)
+    return f, writer
+
+
 class SlamNode(Node):
     def __init__(self):
         super().__init__('slam_control')
@@ -46,7 +54,7 @@ class SlamNode(Node):
         self.declare_parameter('max_blind_time', 30.0)  # stop after this many s with no tag
         self.declare_parameter('min_cmd', 0.30)  # smallest wheel command while moving
         self.declare_parameter('deadband', 0.10)  # wheel commands below this do nothing
-        self.declare_parameter('min_turn_cmd', 0.38)  # smallest wheel command while spinning (the calibrated 90 deg turn used 0.38)
+        self.declare_parameter('min_turn_cmd', 0.38)  # smallest wheel command while spinning (90 deg turn calibrated at 0.38)
         self.declare_parameter('turn_gain', 1.0)  # real turn / commanded turn (1 = the turn calibration is exact)
         self.declare_parameter('turn_tol_deg', 5.0)  # a turn is done below this heading error
         self.declare_parameter('reaim_tol_deg', 12.0)  # must stay above turn_tol_deg
@@ -86,18 +94,13 @@ class SlamNode(Node):
         self.logged_wp = -2  # last waypoint whose map was saved
         self.t_start = self.t_prev = self.last_seen = time.monotonic()
 
+        # three logs per run: the trajectory, the map after each waypoint, and every detection
         os.makedirs(param('log_dir'), exist_ok=True)
-        stamp = time.strftime('%Y%m%d_%H%M%S')
-        self.log_path = os.path.join(param('log_dir'), f'slam_{stamp}.csv')
-        self.landmark_path = os.path.join(param('log_dir'), f'slam_{stamp}_landmarks.csv')
-        self.detection_path = os.path.join(param('log_dir'), f'slam_{stamp}_detections.csv')
-        self.log_file, self.landmark_file = open(self.log_path, 'w', newline=''), open(self.landmark_path, 'w', newline='')
-        self.detection_file = open(self.detection_path, 'w', newline='')
-        self.log, self.landmark_log = csv.writer(self.log_file), csv.writer(self.landmark_file)
-        self.detection_log = csv.writer(self.detection_file)
-        self.log.writerow(LOG_COLUMNS)
-        self.landmark_log.writerow(LANDMARK_COLUMNS)
-        self.detection_log.writerow(DETECTION_COLUMNS)
+        stem = os.path.join(param('log_dir'), time.strftime('slam_%Y%m%d_%H%M%S'))
+        self.log_path = f'{stem}.csv'
+        self.log_file, self.log = open_csv(self.log_path, LOG_COLUMNS)
+        self.landmark_file, self.landmark_log = open_csv(f'{stem}_landmarks.csv', LANDMARK_COLUMNS)
+        self.detection_file, self.detection_log = open_csv(f'{stem}_detections.csv', DETECTION_COLUMNS)
         self.create_timer(1.0 / self.rate, self.tick)
         self.get_logger().info(f'{len(waypoints)} waypoints; logging to {self.log_path}')
 
@@ -181,7 +184,7 @@ class SlamNode(Node):
         if seen:
             self.last_seen = now
         t = now - self.t_start
-        # stay still until a few tags are mapped from the known start pose, so the map has an anchor
+        # stay still until a few tags are mapped from the start pose (the origin), so the map has an anchor
         waiting = t < self.start_delay or (len(self.slam.index) < self.start_landmarks and t < self.start_delay + self.start_wait)
         if waiting:
             self.last_seen = now  # the no-tag timer starts when the robot starts moving
@@ -198,7 +201,7 @@ class SlamNode(Node):
         if self.ctrl.done_wp != self.logged_wp:
             self.save_map(t)
         pose, cov = self.slam.pose, self.slam.P
-        self.log.writerow([f'{ros_s:.3f}', f'{t:.3f}', *(f'{v:.4f}' for v in pose), f'{cmd[0]:.4f}', f'{cmd[1]:.4f}',
+        self.log.writerow([f'{ros_s:.3f}', f'{t:.3f}', *(f'{p:.4f}' for p in pose), f'{cmd[0]:.4f}', f'{cmd[1]:.4f}',
                            len(seen), '|'.join(map(str, seen)), self.ctrl.i, self.ctrl.done_wp, self.ctrl.phase,
                            f'{(cov[0][0] + cov[1][1]) ** 0.5:.4f}', len(self.slam.index),
                            self.slam.accepted, self.slam.rejected])
@@ -208,7 +211,6 @@ class SlamNode(Node):
         self.send(0.0, 0.0)
         time.sleep(0.05)  # let the stop message go out
         self.save_map(time.monotonic() - self.t_start)
-        self.detection_file.flush()
         self.log_file.close()
         self.landmark_file.close()
         self.detection_file.close()
