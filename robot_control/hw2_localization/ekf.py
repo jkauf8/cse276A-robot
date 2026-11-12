@@ -2,6 +2,8 @@
 
 predict: moves the pose using the last wheel command (same model as velocity_control.py).
 update: corrects the pose with the range and bearing to a tag at a known position.
+
+hw3_slam reuses the model constants, the camera helpers and the noise settings from this module.
 """
 import math
 from dataclasses import dataclass

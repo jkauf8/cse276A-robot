@@ -1,6 +1,7 @@
 """Stop-turn-go controller that uses the EKF pose. step(pose, t) returns the [left, right] wheel command.
 
 Same moves as velocity_control.py, but a move ends when the estimated pose says so, not when a timer runs out.
+Used by localization_control (HW2) and slam_control (HW3, which sets min_turn_cmd).
 """
 import math
 
@@ -28,10 +29,11 @@ class Controller:
         self.turn_tol, self.reaim_tol, self.pos_tol = turn_tol, reaim_tol, pos_tol
         self.final_checks, self.checks = final_checks, 0  # re-checks allowed / done
         floor = max(min_cmd, deadband)  # commands below the deadband do nothing
-        # slowest speeds that still give a wheel command of floor
-        self.v_min = floor / (wheel_cmds(0.1, 0.0)[0] / 0.1)
         # spins have their own floor (min_turn_cmd=None: same floor as driving)
-        self.w_min = (floor if min_turn_cmd is None else max(min_turn_cmd, deadband)) / (wheel_cmds(0.0, 0.1)[1] / 0.1)
+        turn_floor = floor if min_turn_cmd is None else max(min_turn_cmd, deadband)
+        # slowest speed and turn rate that still give a wheel command of the floor
+        self.v_min = floor / (wheel_cmds(0.1, 0.0)[0] / 0.1)
+        self.w_min = turn_floor / (wheel_cmds(0.0, 0.1)[1] / 0.1)
         self.i = 0  # current waypoint
         self.phase = 'face'  # face -> drive -> final; 'settle' is the pause between moves
         self.after = None  # phase to start after the pause
