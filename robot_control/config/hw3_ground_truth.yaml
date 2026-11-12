@@ -1,0 +1,13 @@
+# Landmark positions (m) for the HW3 course, in the ground-truth frame:
+# origin = bottom-left corner of the 8 ft square, x along the bottom wall (to the right), y along the left wall (up).
+# Tags sit 32 in and 64 in along each wall (placed at exactly these points with a tape).
+# The robot faces the top wall (tags 3 and 2) at the start, which is a heading of 90 degrees in this frame.
+landmarks:
+  7: [0.8128, 0.0]
+  6: [1.6256, 0.0]
+  5: [2.4384, 0.8128]
+  4: [2.4384, 1.6256]
+  3: [1.6256, 2.4384]
+  2: [0.8128, 2.4384]
+  1: [0.0, 1.6256]
+  0: [0.0, 0.8128]

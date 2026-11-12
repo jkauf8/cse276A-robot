@@ -9,31 +9,18 @@ from rclpy.node import Node
 from rclpy.signals import SignalHandlerOptions
 from std_msgs.msg import Float32MultiArray
 
-# ---- Calibration constants ----
-# Geisel carpet
-CMD_PER_MPS = 0.74  # motor command per m/s of wheel speed
-TRACK_WIDTH = 0.37  # wheel spacing, which sets the turn angle
-LEFT_SCALE = 0.9975  # multiplier for left wheel motor command
-RIGHT_SCALE = 0.9970  # multiplier for right wheel motor command
+# ---- Calibration constants (new robot base, office carpet; earlier calibrations are in the git history) ----
+# hw2_localization/ekf.py repeats the first four, and slam_control / localization_control refuse to start if they differ.
+CMD_PER_MPS = 0.706  # motor command per m/s of wheel speed
+TRACK_WIDTH = 0.316  # effective wheel spacing, which sets the turn angle (tuned so a TURN_RATE spin command is about 0.38)
+LEFT_SCALE = 1.0160  # multiplier for left wheel motor command
+RIGHT_SCALE = 0.9810  # multiplier for right wheel motor command
 CRUISE_SPEED = 0.55  # driving speed in m/s
-TURN_RATE = 2.25  # spin speed in rad/s
+TURN_RATE = 3.49  # spin speed in rad/s (measured: 9 messages at 20 Hz = 90 deg)
 TURN_SIGN = 1  # turn direction (flip to -1 if the robot turns the wrong way)
 PAUSE = 1  # seconds stopped between moves
 RATE = 20.0  # Hz publish rate; motor_control stops the wheels after 0.15 s of silence
 CMD_LIMIT = 0.5  # motor_control clips each wheel to +/-0.5
-
-
-# justin carpet at home
-# CMD_PER_MPS = 0.74
-# TRACK_WIDTH = 0.69
-# LEFT_SCALE = 0.9975
-# RIGHT_SCALE = 1.0
-# CRUISE_SPEED = 0.55
-# TURN_RATE = 1.57
-# TURN_SIGN = 1
-# PAUSE = 0.3
-# RATE = 20.0
-# CMD_LIMIT = 0.5
 
 
 def wrap_angle(a):
@@ -93,7 +80,7 @@ class WaypointNode(Node):
         self.pub.publish(Float32MultiArray(data=[float(left), float(right)]))
 
     def tick(self):
-        # advance if current move over (checks every 1/RATE (50ms atm)), stop when moves run out, otherwise send current move 
+        # advance if current move over (checks every 1/RATE (50ms atm)), stop when moves run out, otherwise send current move
         while (self.index < len(self.segments)
                and time.monotonic() - self.t0 >= self.segments[self.index][2]):
             self.t0 += self.segments[self.index][2]  # carry the remainder so moves don't lose time
