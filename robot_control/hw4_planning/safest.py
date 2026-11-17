@@ -4,7 +4,8 @@ import math
 from hw4_planning.world import clearance, segment_free
 
 TIE_PENALTY = 1e-6
-WEIGHT = 0.5
+WEIGHT = 2.0
+KEEP = 0.98  # simplified path keeps this share of the raw path's min clearance
 STEPS = [(dx, dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy]
 
 
@@ -65,7 +66,7 @@ def plan_safest(world, radius, resolution=0.02, weight=WEIGHT, prefer='right'):
     raw = [(c[0] * resolution, c[1] * resolution) for c in cells[::-1]]
     raw[0], raw[-1] = world.start, world.goal
 
-    floor = max(radius, 0.9 * min(clearance(world, p) for p in raw))
+    floor = max(radius, KEEP * min(clearance(world, p) for p in raw))
     path, i = [raw[0]], 0
     while i < len(raw) - 1:
         j = next((j for j in range(len(raw) - 1, i, -1)

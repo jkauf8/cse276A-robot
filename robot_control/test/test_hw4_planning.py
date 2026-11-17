@@ -94,9 +94,19 @@ def test_safest_stays_clear_of_everything(world):
 def test_safest_is_safer_but_longer_than_shortest(world):
     fast = plan_shortest(world, radius=ROBOT_RADIUS + 0.05)
     safe = plan_safest(world, radius=ROBOT_RADIUS)
-    assert min_clearance(world, safe) > 0.40
+    assert min_clearance(world, safe) >= 0.45
     assert min_clearance(world, safe) > min_clearance(world, fast) + 0.1
     assert length(safe) > length(fast)
+
+
+def test_safest_keeps_more_clearance_on_average(world):
+    def mean_clearance(path):
+        values = [clearance(world, p) for p in points_along(path)]
+        return sum(values) / len(values)
+
+    safe = plan_safest(world, radius=ROBOT_RADIUS)
+    fast = plan_shortest(world, ROBOT_RADIUS + 0.05)
+    assert mean_clearance(safe) > mean_clearance(fast) + 0.08
 
 
 def test_safest_has_few_waypoints(world):
