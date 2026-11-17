@@ -17,11 +17,12 @@ def world():
     return load_world(WORLD_FILE)
 
 
-def test_start_frame_puts_the_start_at_the_origin_facing_the_goal(world):
+def test_start_frame_puts_the_start_at_the_origin_facing_the_top_wall(world):
     assert to_start_frame(world, world.start) == pytest.approx((0.0, 0.0), abs=1e-9)
     gx, gy = to_start_frame(world, world.goal)
-    assert gx == pytest.approx(math.dist(world.start, world.goal), abs=1e-3)  # the start heading points at the goal
-    assert gy == pytest.approx(0.0, abs=1e-3)
+    assert gx == pytest.approx(world.goal[1] - world.start[1], abs=1e-3)  # forward is floor +y
+    assert gy == pytest.approx(world.start[0] - world.goal[0], abs=1e-3)  # left is floor -x
+    assert (gx, gy) == pytest.approx((2.134, 2.134), abs=1e-3)
 
 
 def test_from_start_frame_undoes_to_start_frame(world):

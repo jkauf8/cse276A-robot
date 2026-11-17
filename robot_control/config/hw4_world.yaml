@@ -14,4 +14,4 @@ obstacle:             # 1 ft square centered at (5, 5) ft: [x_min, y_min, x_max,
   rect: [1.3716, 1.3716, 1.6764, 1.6764]
 start: [2.591, 0.457]   # (8.5, 1.5) ft
 goal: [0.457, 2.591]    # (1.5, 8.5) ft
-start_heading_deg: 135  # facing the goal
+start_heading_deg: 90   # the robot starts facing the top wall

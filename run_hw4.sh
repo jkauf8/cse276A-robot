@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Starts the HW4 (planned path) nodes on the robot, each in its own tmux window (camera, tags, params, motors, run).
-# Put the robot on the start mark, wheel midpoint on the mark, facing the goal (heading 135 deg).
+# Put the robot on the start mark, wheel midpoint on the mark, facing the top wall (heading 90 deg).
 #   ./run_hw4.sh          start the fast plan; the run window waits for Enter
 #   PLAN=safe ./run_hw4.sh   same with the safe plan
 #   ./run_hw4.sh build    git pull and colcon build, then start
