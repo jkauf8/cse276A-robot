@@ -35,6 +35,7 @@ def test_world_file(world):
     assert sorted(world.landmarks) == list(range(12))
     assert world.obstacle == pytest.approx((4.5 * FT, 4.5 * FT, 5.5 * FT, 5.5 * FT))
     assert world.start_heading == pytest.approx(math.radians(90))
+    assert world.goal_heading == pytest.approx(math.radians(135))
 
 
 def test_clearance(world):

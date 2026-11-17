@@ -41,7 +41,8 @@ def test_waypoints_face_the_next_leg(world):
     pts = [to_start_frame(world, p) for p in path]
     legs = [math.atan2(b[1] - a[1], b[0] - a[0]) for a, b in zip(pts, pts[1:])]
     assert len(wps) == len(path)
-    for (x, y, theta), p, want in zip(wps, pts, legs + legs[-1:]):
+    goal_heading_in_start_frame = math.radians(45)  # goal heading 135 deg minus start heading 90 deg
+    for (x, y, theta), p, want in zip(wps, pts, legs + [goal_heading_in_start_frame]):
         assert (x, y) == pytest.approx(p, abs=1e-9)
         assert theta == pytest.approx(want)
 

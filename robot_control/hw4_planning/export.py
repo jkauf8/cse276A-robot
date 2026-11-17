@@ -45,7 +45,7 @@ def from_start_frame(world, p):
 def waypoints(world, path):
     pts = [to_start_frame(world, p) for p in path]
     thetas = [math.atan2(b[1] - a[1], b[0] - a[0]) for a, b in zip(pts, pts[1:])]
-    thetas.append(thetas[-1])
+    thetas.append(wrap(world.goal_heading - world.start_heading))
     return [(x, y, th) for (x, y), th in zip(pts, thetas)]
 
 

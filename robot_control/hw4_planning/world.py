@@ -14,6 +14,7 @@ class World:
     start: tuple
     goal: tuple
     start_heading: float
+    goal_heading: float
 
 
 def load_world(path):
@@ -26,6 +27,7 @@ def load_world(path):
         start=tuple(map(float, d['start'])),
         goal=tuple(map(float, d['goal'])),
         start_heading=math.radians(d['start_heading_deg']),
+        goal_heading=math.radians(d['goal_heading_deg']),
     )
 
 
