@@ -1,0 +1,17 @@
+# HW4 world (m). Origin = bottom-left corner of the 10 ft square, x along the bottom wall (right), y along the left wall (up).
+# Tags: 8.5x11 in sheets flush to the corners, 8.5 in side along the wall, tag centered on the sheet (0.108 m from the corner).
+arena: 3.048          # side of the square (10 ft)
+landmarks:
+  0: [0.0, 2.940]
+  1: [0.108, 3.048]
+  2: [0.0, 0.108]
+  3: [3.048, 2.940]
+  4: [2.940, 3.048]
+  5: [3.048, 0.108]
+  6: [2.940, 0.0]
+  7: [0.108, 0.0]
+obstacle:             # 1 ft square centered at (5, 5) ft: [x_min, y_min, x_max, y_max]
+  rect: [1.3716, 1.3716, 1.6764, 1.6764]
+start: [2.591, 0.457]   # (8.5, 1.5) ft
+goal: [0.457, 2.591]    # (1.5, 8.5) ft
+start_heading_deg: 135  # facing the goal

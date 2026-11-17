@@ -1,0 +1,4 @@
+# x, y, theta per line (m, m, rad), relative to the start pose
+0.0000, -0.0000, -0.28612
+1.5090, -0.4439, 0.28612
+3.0179, 0.0000, 0.28612

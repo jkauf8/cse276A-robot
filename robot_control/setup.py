@@ -14,9 +14,11 @@ setup(
         ('share/' + package_name + '/config', ['config/waypoints.txt', 'config/hw2_waypoints.txt',
                                                'config/localization_full.yaml', 'config/apriltag_hw2.yaml',
                                                'config/slam_full.yaml', 'config/apriltag_hw3.yaml',
-                                               'config/hw3_square.txt', 'config/hw3_octagon.txt']),
+                                               'config/hw3_square.txt', 'config/hw3_octagon.txt',
+                                               'config/hw4_world.yaml', 'config/hw4_fast.txt', 'config/hw4_safe.txt',
+                                               'config/hw4_localization.yaml']),
         ('share/' + package_name + '/launch', ['launch/tag_detection_launch.py', 'launch/localization_launch.py',
-                                               'launch/slam_launch.py']),
+                                               'launch/slam_launch.py', 'launch/hw4_launch.py']),
     ],
     install_requires=[
         'setuptools',
@@ -37,6 +39,7 @@ setup(
             'velocity_control = robot_control.velocity_control:main',
             'localization_control = robot_control.localization_control:main',
             'slam_control = robot_control.slam_control:main',
+            'hw4_control = robot_control.hw4_control:main',
         ],
     },
 )
