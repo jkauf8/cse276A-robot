@@ -19,7 +19,7 @@ class PlanNode(LocalizationNode):
         def param(name):
             return self.get_parameter(name).value
 
-        # the base class builds a plain Controller, so rebuild it as an ArriveController with min_turn_cmd and the re-drive settings
+        # the base class builds a plain Controller, so swap in the ArriveController
         self.ctrl = ArriveController(self.ctrl.waypoints, vc.wheel_cmds, vc.CRUISE_SPEED, vc.TURN_RATE, vc.PAUSE, vc.TURN_SIGN,
                                     min_cmd=param('min_cmd'), deadband=param('deadband'),
                                     turn_tol=math.radians(param('turn_tol_deg')), reaim_tol=math.radians(param('reaim_tol_deg')),
@@ -29,7 +29,6 @@ class PlanNode(LocalizationNode):
 
 
 def main(args=None):
-    # run until the controller finishes; always stop the wheels at the end, even on Ctrl-C
     rclpy.init(args=args, signal_handler_options=SignalHandlerOptions.NO)
     node = PlanNode()
     try:

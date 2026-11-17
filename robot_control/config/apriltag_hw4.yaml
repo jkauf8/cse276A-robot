@@ -1,4 +1,4 @@
-# Settings for apriltag_node (HW4, ids 0-11 (0-7 on the arena edges, 8-11 on the box), decimate 1.0 so tags are found at 3 m; pass apriltag_params:=<this file> to tag_detection_launch.py). The launch argument tag_size overrides size.
+# apriltag_node settings for HW4 (ids 0-11). The launch argument tag_size overrides size.
 /**:
   ros__parameters:
     image_transport: raw

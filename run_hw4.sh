@@ -8,11 +8,11 @@
 #   ./run_hw4.sh look     count tag detections for 8 s (starts the camera and tags itself if they are not running; a later normal run replaces that session)
 # A session that is already running is stopped and replaced.
 # tmux: Ctrl-b then 0-4 switches windows, Ctrl-b d leaves, "tmux attach -t hw4" comes back
-WS=${WS:-$HOME/ros2_ws}                       # ROS workspace
-REPO=$(dirname "$(readlink -f "$0")")         # this repo
-CONFIG=${CONFIG:-hw4_localization.yaml}  # settings file in robot_control/config
+WS=${WS:-$HOME/ros2_ws}
+REPO=$(dirname "$(readlink -f "$0")")
+CONFIG=${CONFIG:-hw4_localization.yaml}
 TAG_SIZE=${TAG_SIZE:-0.16}                    # tag size (black square), m
-PLAN=${PLAN:-fast}                          # fast or safe (waypoint file hw4_<plan>.txt)
+PLAN=${PLAN:-fast}
 DECIMATE=${DECIMATE:-1.0}                   # set live because an old installed apriltag config may still say 2.0
 SESSION=hw4
 SRC="source /opt/ros/jazzy/setup.bash && source $WS/install/setup.bash"
@@ -78,7 +78,6 @@ tmux new-window -t $SESSION -n motors
 tmux send-keys -t $SESSION:motors "$SRC && ros2 run robot_control motor_control" Enter
 sleep 2
 
-# the run command is typed but not started: press Enter when the robot is on the start marker
 tmux new-window -t $SESSION -n run
 tmux send-keys -t $SESSION:run "$SRC" Enter
 tmux send-keys -t $SESSION:run 'ros2 launch robot_control hw4_launch.py params_file:=$(ros2 pkg prefix robot_control)/share/robot_control/config/'"$CONFIG"' waypoints_file:=$(ros2 pkg prefix robot_control)/share/robot_control/config/hw4_'"$PLAN"'.txt log_dir:=$HOME/hw4_logs/'"$PLAN"

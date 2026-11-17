@@ -39,15 +39,15 @@ def test_world_file(world):
 
 
 def test_clearance(world):
-    assert clearance(world, (1.0, 0.5)) == pytest.approx(0.5)  # nearest edge is the bottom wall
-    assert clearance(world, (1.2, 1.5)) == pytest.approx(world.obstacle[0] - 1.2)  # beside the left face
-    assert clearance(world, (1.524, 1.524)) < 0  # inside the box
+    assert clearance(world, (1.0, 0.5)) == pytest.approx(0.5)
+    assert clearance(world, (1.2, 1.5)) == pytest.approx(world.obstacle[0] - 1.2)
+    assert clearance(world, (1.524, 1.524)) < 0
 
 
 def test_segment_free(world):
-    assert not segment_free(world, world.start, world.goal, 0.0)  # runs through the box
-    assert segment_free(world, (0.5, 0.5), (2.5, 0.5), 0.1)  # along the bottom, clear of everything
-    assert not segment_free(world, (0.5, 0.5), (2.5, 0.5), 0.6)  # too fat for the wall
+    assert not segment_free(world, world.start, world.goal, 0.0)
+    assert segment_free(world, (0.5, 0.5), (2.5, 0.5), 0.1)
+    assert not segment_free(world, (0.5, 0.5), (2.5, 0.5), 0.6)
 
 
 def test_shortest_without_inflation_is_ten_feet(world):

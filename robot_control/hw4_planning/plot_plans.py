@@ -1,7 +1,4 @@
-"""Figures for the HW4 report.
-
-    python3 -m hw4_planning.plot_plans [--out DIR] [--fast-log CSV] [--safe-log CSV]   # from robot_control/
-"""
+"""Figures for the HW4 report."""
 import argparse
 import csv
 import math
@@ -38,7 +35,6 @@ def draw_arena(ax, world):
     ax.fill([x0, x1, x1, x0], [y0, y0, y1, y1], color='0.35', zorder=3)
     for i, (x, y) in world.landmarks.items():
         ax.plot(x, y, 's', color='k', ms=5)
-        # label on the inner side of the tag, away from the nearest wall
         ax.annotate(str(i), (x, y), textcoords='offset points', ha='center', va='center', fontsize=9, zorder=5,
                     bbox=dict(boxstyle='round,pad=0.1', fc='white', ec='none', alpha=0.7),
                     xytext=_label_offset(world, x, y))

@@ -41,7 +41,6 @@ def _box_distance(box, p):
     dy = max(y0 - p[1], 0.0, p[1] - y1)
     if dx > 0 or dy > 0:
         return math.hypot(dx, dy)
-    # inside the box: minus the depth to the nearest face
     return -min(p[0] - x0, x1 - p[0], p[1] - y0, y1 - p[1])
 
 
