@@ -71,3 +71,11 @@ def test_localization_yaml_holds_the_tags_in_the_start_frame(world, tmp_path):
         assert (tags['x'][i], tags['y'][i]) == pytest.approx(to_start_frame(world, world.landmarks[tag_id]), abs=5e-5)
     assert params['camera']['x'] == pytest.approx(0.01)
     assert params['min_turn_cmd'] == pytest.approx(0.38)
+
+
+def test_localization_yaml_loosens_the_ekf_gate(world, tmp_path):
+    out = tmp_path / 'loc.yaml'
+    write_localization_yaml(str(out), world)
+    params = yaml.safe_load(out.read_text())['/**']['ros__parameters']
+    assert params['ekf']['gate'] == 1000.0
+    assert params['ekf']['gate'] >= 100

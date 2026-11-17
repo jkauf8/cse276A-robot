@@ -13,6 +13,8 @@
       y: 0.0
       z: 0.125
       pitch_deg: 0.0
+    ekf:
+      gate: 1000.0
     camera_frame: camera_frame
     tag_frame_prefix: tag_
     waypoints_file: ''

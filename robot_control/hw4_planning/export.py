@@ -20,6 +20,9 @@ CRUISE_SPEED = 0.55
 TURN_RATE = 3.49
 PAUSE = 1.0
 
+# loose gate: the tag map is known and the start pose is set by hand, so a tight gate locks every detection out
+EKF_GATE = 1000.0
+
 CONFIG = os.path.join(os.path.dirname(__file__), '..', 'config')
 
 
@@ -106,6 +109,8 @@ def write_localization_yaml(path, world):
       y: 0.0
       z: 0.125
       pitch_deg: 0.0
+    ekf:
+      gate: {EKF_GATE}
     camera_frame: camera_frame
     tag_frame_prefix: tag_
     waypoints_file: ''
