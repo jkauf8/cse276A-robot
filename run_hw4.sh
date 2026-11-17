@@ -5,7 +5,7 @@
 #   PLAN=safe ./run_hw4.sh   same with the safe plan
 #   ./run_hw4.sh build    git pull and colcon build, then start
 #   ./run_hw4.sh stop     stop the robot and close everything
-#   ./run_hw4.sh look     count tag detections for 8 s (use it with the robot on the start mark)
+#   ./run_hw4.sh look     count tag detections for 8 s (starts the camera and tags itself if they are not running; a later normal run replaces that session)
 # A session that is already running is stopped and replaced.
 # tmux: Ctrl-b then 0-4 switches windows, Ctrl-b d leaves, "tmux attach -t hw4" comes back
 WS=${WS:-$HOME/ros2_ws}                       # ROS workspace
@@ -17,6 +17,19 @@ DECIMATE=${DECIMATE:-1.0}                   # set live because an old installed 
 SESSION=hw4
 SRC="source /opt/ros/jazzy/setup.bash && source $WS/install/setup.bash"
 
+# camera, tags and params windows; the caller creates the session with its first window named camera
+start_camera_tags() {
+  tmux send-keys -t $SESSION:camera "$SRC && ros2 launch robot_vision_camera robot_vision_camera.launch.py" Enter
+  sleep 4
+
+  tmux new-window -t $SESSION -n tags
+  tmux send-keys -t $SESSION:tags "$SRC && ros2 launch robot_control tag_detection_launch.py tag_size:=$TAG_SIZE apriltag_params:=\$(ros2 pkg prefix robot_control)/share/robot_control/config/apriltag_hw4.yaml" Enter
+  sleep 3
+
+  tmux new-window -t $SESSION -n params
+  tmux send-keys -t $SESSION:params "$SRC && for i in \$(seq 30); do ros2 param set /apriltag detector.decimate $DECIMATE && break; sleep 1; done; ros2 param get /apriltag detector.decimate" Enter
+}
+
 if [ "$1" = "stop" ]; then
   tmux send-keys -t $SESSION:run C-c 2>/dev/null
   sleep 1
@@ -26,6 +39,20 @@ fi
 
 if [ "$1" = "look" ]; then
   eval "$SRC"
+  if ! tmux has-session -t $SESSION 2>/dev/null; then
+    tmux new-session -d -s $SESSION -n camera
+    start_camera_tags
+    echo "camera and tags started and left running in tmux session $SESSION (./run_hw4.sh stop closes them)"
+    for i in $(seq 30); do
+      ros2 node list 2>/dev/null | grep -qx /apriltag && break
+      sleep 1
+    done
+    if ! ros2 node list 2>/dev/null | grep -qx /apriltag; then
+      echo "the /apriltag detector did not start within 30 s; check the tags window (tmux attach -t $SESSION)"
+      exit 1
+    fi
+    sleep 3
+  fi
   timeout -s INT 8 ros2 topic echo /detections > /tmp/d.txt
   grep -c ' id:' /tmp/d.txt
   grep ' id:' /tmp/d.txt | sort | uniq -c
@@ -45,15 +72,7 @@ if tmux has-session -t $SESSION 2>/dev/null; then
 fi
 
 tmux new-session -d -s $SESSION -n camera
-tmux send-keys -t $SESSION:camera "$SRC && ros2 launch robot_vision_camera robot_vision_camera.launch.py" Enter
-sleep 4
-
-tmux new-window -t $SESSION -n tags
-tmux send-keys -t $SESSION:tags "$SRC && ros2 launch robot_control tag_detection_launch.py tag_size:=$TAG_SIZE apriltag_params:=\$(ros2 pkg prefix robot_control)/share/robot_control/config/apriltag_hw4.yaml" Enter
-sleep 3
-
-tmux new-window -t $SESSION -n params
-tmux send-keys -t $SESSION:params "$SRC && for i in \$(seq 30); do ros2 param set /apriltag detector.decimate $DECIMATE && break; sleep 1; done; ros2 param get /apriltag detector.decimate" Enter
+start_camera_tags
 
 tmux new-window -t $SESSION -n motors
 tmux send-keys -t $SESSION:motors "$SRC && ros2 run robot_control motor_control" Enter
