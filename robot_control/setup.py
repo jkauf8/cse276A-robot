@@ -16,7 +16,7 @@ setup(
                                                'config/slam_full.yaml', 'config/apriltag_hw3.yaml',
                                                'config/hw3_square.txt', 'config/hw3_octagon.txt',
                                                'config/hw4_world.yaml', 'config/hw4_fast.txt', 'config/hw4_safe.txt',
-                                               'config/hw4_localization.yaml']),
+                                               'config/hw4_localization.yaml', 'config/apriltag_hw4.yaml']),
         ('share/' + package_name + '/launch', ['launch/tag_detection_launch.py', 'launch/localization_launch.py',
                                                'launch/slam_launch.py', 'launch/hw4_launch.py']),
     ],
