@@ -10,7 +10,7 @@ def wheel_cmds(v, w):
     return (v - w * HALF_TRACK, v + w * HALF_TRACK)
 
 
-def run(disturb=None):
+def run(disturb=None, shift=-0.12):
     """Drive a unicycle through the controller; disturb(ctrl) returns True once per entry to the pre-verify pause."""
     ctrl = ArriveController([(0, 0, 0), (1.0, 0, 0)], wheel_cmds, 0.55, 3.49, 1.0)
     pose = [0.0, 0.0, 0.0]
@@ -21,7 +21,7 @@ def run(disturb=None):
         t += DT
         in_pause = ctrl.phase == 'settle' and ctrl.after == 'verify'
         if in_pause and armed and disturb is not None and disturb():
-            pose[0] -= 0.12
+            pose[0] += shift
         armed = not in_pause
         left, right = ctrl.step(tuple(pose), t)
         v, w = (left + right) / 2, (right - left) / 0.3
@@ -50,3 +50,10 @@ def test_gives_up_after_max_redrives():
     ctrl, _ = run(lambda: True)
     assert ctrl.done
     assert ctrl.redrives == 2
+
+
+def test_no_turn_around_for_an_overshoot():
+    fired = []
+    ctrl, _ = run(lambda: not fired and not fired.append(1), shift=0.12)
+    assert ctrl.done
+    assert ctrl.redrives == 0

@@ -2,6 +2,7 @@
 import math
 
 from hw2_localization.controller import Controller
+from hw2_localization.ekf import wrap
 
 
 class ArriveController(Controller):
@@ -17,8 +18,10 @@ class ArriveController(Controller):
     def _finish_waypoint(self, t):
         gx, gy, _ = self.waypoints[self.i]
         # the final heading check is the first time the corner tags correct the pose, so re-check position after it
+        # turning around for a few cm of overshoot costs more than it fixes
+        ahead = abs(wrap(math.atan2(gy - self.pose[1], gx - self.pose[0]) - self.pose[2])) < math.pi / 2
         if (self.i == len(self.waypoints) - 1 and self.redrives < self.max_redrives
-                and math.hypot(gx - self.pose[0], gy - self.pose[1]) > self.arrive_tol):
+                and math.hypot(gx - self.pose[0], gy - self.pose[1]) > self.arrive_tol and ahead):
             self.redrives += 1
             self.checks = 0  # verify the heading again after the re-drive
             return self._stop_then('face', t)
