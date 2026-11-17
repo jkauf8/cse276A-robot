@@ -65,12 +65,22 @@ def test_localization_yaml_holds_the_tags_in_the_start_frame(world, tmp_path):
     write_localization_yaml(str(out), world)
     params = yaml.safe_load(out.read_text())['/**']['ros__parameters']
     tags = params['tags']
-    assert tags['ids'] == list(range(8))
-    assert len(tags['z']) == len(tags['yaw']) == 8
+    assert tags['ids'] == list(range(12))
+    assert len(tags['z']) == len(tags['yaw']) == 12
     for i, tag_id in enumerate(tags['ids']):
         assert (tags['x'][i], tags['y'][i]) == pytest.approx(to_start_frame(world, world.landmarks[tag_id]), abs=5e-5)
     assert params['camera']['x'] == pytest.approx(0.01)
     assert params['min_turn_cmd'] == pytest.approx(0.38)
+
+
+def test_box_tags_face_out_of_their_box_face(world, tmp_path):
+    out = tmp_path / 'loc.yaml'
+    write_localization_yaml(str(out), world)
+    tags = yaml.safe_load(out.read_text())['/**']['ros__parameters']['tags']
+    expected = {10: 0.0, 9: -math.pi / 2, 8: math.pi / 2, 11: math.pi}  # floor yaw minus the 90 deg start heading
+    for tag_id, want in expected.items():
+        diff = tags['yaw'][tags['ids'].index(tag_id)] - want
+        assert math.atan2(math.sin(diff), math.cos(diff)) == pytest.approx(0.0, abs=1e-3)
 
 
 def test_localization_yaml_loosens_the_ekf_gate(world, tmp_path):

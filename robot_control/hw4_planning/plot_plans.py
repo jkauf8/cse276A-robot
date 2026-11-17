@@ -21,6 +21,16 @@ COLORS = {'fast': '#d95f02', 'safe': '#1b9e77'}
 LOG_COLOR = '#7570b3'
 
 
+def _label_offset(world, x, y):
+    x0, y0, x1, y1 = world.obstacle
+    if x0 - 1e-6 <= x <= x1 + 1e-6 and y0 - 1e-6 <= y <= y1 + 1e-6:
+        # box tags: push the label straight out of its face so the four never overlap
+        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        return (16 * (x - cx) / abs(x - cx), 0) if abs(x - cx) > abs(y - cy) else (0, 16 * (y - cy) / abs(y - cy))
+    a = world.arena
+    return (11 if x < a / 2 else -11, 11 if y < a / 2 else -11)
+
+
 def draw_arena(ax, world):
     a = world.arena
     ax.plot([0, a, a, 0, 0], [0, 0, a, a, 0], 'k-', lw=2)
@@ -31,7 +41,7 @@ def draw_arena(ax, world):
         # label on the inner side of the tag, away from the nearest wall
         ax.annotate(str(i), (x, y), textcoords='offset points', ha='center', va='center', fontsize=9, zorder=5,
                     bbox=dict(boxstyle='round,pad=0.1', fc='white', ec='none', alpha=0.7),
-                    xytext=(11 if x < a / 2 else -11, 11 if y < a / 2 else -11))
+                    xytext=_label_offset(world, x, y))
     ax.plot(*world.start, 'o', color='tab:blue', ms=10, zorder=6, label='start')
     ax.plot(*world.goal, '*', color='tab:red', ms=16, zorder=6, label='goal')
     ax.set_aspect('equal')

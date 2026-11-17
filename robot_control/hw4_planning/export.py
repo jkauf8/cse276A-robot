@@ -80,7 +80,11 @@ def min_clearance(world, path, step=0.01):
 
 
 def _wall_normal(world, p):
-    # direction (floor frame) pointing away from the nearest wall
+    # direction (floor frame) pointing away from the nearest wall, or out of the box face the tag is on
+    x0, y0, x1, y1 = world.obstacle
+    if x0 - 1e-6 <= p[0] <= x1 + 1e-6 and y0 - 1e-6 <= p[1] <= y1 + 1e-6:
+        return min([(abs(p[0] - x0), math.pi), (abs(p[0] - x1), 0.0), (abs(p[1] - y0), -math.pi / 2),
+                    (abs(p[1] - y1), math.pi / 2)])[1]
     d = [(p[0], 0.0), (p[1], math.pi / 2), (world.arena - p[0], math.pi), (world.arena - p[1], -math.pi / 2)]
     return min(d)[1]
 

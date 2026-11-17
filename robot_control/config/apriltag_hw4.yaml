@@ -1,4 +1,4 @@
-# Settings for apriltag_node (HW4, ids 0-7, decimate 1.0 so tags are found at 3 m; pass apriltag_params:=<this file> to tag_detection_launch.py). The launch argument tag_size overrides size.
+# Settings for apriltag_node (HW4, ids 0-11 (0-7 on the arena edges, 8-11 on the box), decimate 1.0 so tags are found at 3 m; pass apriltag_params:=<this file> to tag_detection_launch.py). The launch argument tag_size overrides size.
 /**:
   ros__parameters:
     image_transport: raw
@@ -14,5 +14,5 @@
       sharpening: 0.4
       debug: False
     tag:                        # only tags listed in frames are published
-      ids: [0, 1, 2, 3, 4, 5, 6, 7]
-      frames: [tag_0, tag_1, tag_2, tag_3, tag_4, tag_5, tag_6, tag_7]
+      ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+      frames: [tag_0, tag_1, tag_2, tag_3, tag_4, tag_5, tag_6, tag_7, tag_8, tag_9, tag_10, tag_11]

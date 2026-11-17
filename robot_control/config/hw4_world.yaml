@@ -10,6 +10,11 @@ landmarks:
   5: [3.048, 0.108]
   6: [2.940, 0.0]
   7: [0.108, 0.0]
+  # 8-11 sit on the box faces, each centered on its face (PDF labels in brackets)
+  8: [1.3716, 1.524]    # west face (LM4)
+  9: [1.6764, 1.524]    # east face (LM1)
+  10: [1.524, 1.6764]   # north face (LM2)
+  11: [1.524, 1.3716]   # south face (LM3)
 obstacle:             # 1 ft square centered at (5, 5) ft: [x_min, y_min, x_max, y_max]
   rect: [1.3716, 1.3716, 1.6764, 1.6764]
 start: [2.591, 0.457]   # (8.5, 1.5) ft
