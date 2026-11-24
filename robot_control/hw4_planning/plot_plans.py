@@ -21,7 +21,7 @@ LOG_COLOR = '#7570b3'
 def _label_offset(world, x, y):
     x0, y0, x1, y1 = world.obstacle
     if x0 - 1e-6 <= x <= x1 + 1e-6 and y0 - 1e-6 <= y <= y1 + 1e-6:
-        # box tags: push the label straight out of its face so the four never overlap
+        # obstacle tags: push the label straight out of its face so the four never overlap
         cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
         return (16 * (x - cx) / abs(x - cx), 0) if abs(x - cx) > abs(y - cy) else (0, 16 * (y - cy) / abs(y - cy))
     a = world.arena
@@ -79,7 +79,7 @@ def plot_fast(world, path, out, log_csv=None):
     r = ROBOT_RADIUS + MARGIN
     x0, y0, x1, y1 = world.obstacle
     ax.plot([x0 - r, x1 + r, x1 + r, x0 - r, x0 - r], [y0 - r, y0 - r, y1 + r, y1 + r, y0 - r], '--', color='tab:red',
-            lw=1, label=f'box inflated by {r:.3f} m')
+            lw=1, label=f'obstacle inflated by {r:.3f} m')
     draw_path(ax, path, 'fast')
     err = draw_log(ax, world, log_csv) if log_csv else None
     ax.set_title(title(world, path, 'fast', err))
